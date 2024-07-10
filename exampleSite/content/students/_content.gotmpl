@@ -1,0 +1,31 @@
+{{/* Get remote data. */}}
+{{ $data := dict }}
+{{ $url := "https://raw.githubusercontent.com/fiduswriter/simple-datatables/main/docs/demos/5-column-manipulation/datatable.json" }}
+{{ with resources.GetRemote $url }}
+    {{ with .Err }}
+        {{ errorf "Unable to get remote resource %s: %s" $url . }}
+    {{ else }}
+        {{ $data = . | transform.Unmarshal }}
+    {{ end }}
+{{ else }}
+    {{ errorf "Unable to get remote resource %s" $url }}
+{{ end }}
+
+{{/* Add pages and page resources. */}}
+{{ range $data }}
+    {{ $content := dict "mediaType" "text/markdown" "value" .Name }}
+    {{ $dateInput := split (index . "Start Date") "/" }}
+    {{ $date := printf "%s-%s-%s" (index $dateInput 0) (index $dateInput 2) (index $dateInput 1) }}
+
+    {{ $dates := dict "date" (time.AsTime $date) }}
+    {{ $params := dict "city" .City "name" .Name "ext" (index . "Ext.") }}
+
+    {{ $page := dict
+        "dates" $dates
+        "kind" "page"
+        "params" $params
+        "path" (.Name | urlize)
+        "title" .Name
+    }}
+    {{ $.AddPage $page }}
+{{ end }}

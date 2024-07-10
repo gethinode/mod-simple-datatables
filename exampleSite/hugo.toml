@@ -1,15 +1,24 @@
 baseURL = 'http://example.org/'
 languageCode = 'en-us'
-title = 'Test site for mod-template'
+title = 'Test site for mod-simple-datatables'
 
 [module]
-  # Build and serve using local mod-template clone declared in the named Hugo workspace:
-  workspace = "mod-template.work"
+  # Build and serve using local mod-simple-datatables clone declared in the named Hugo workspace:
+  workspace = "mod-simple-datatables.work"
   [[module.imports]]
-    path = "github.com/gethinode/mod-template"
+    path = "github.com/gethinode/mod-simple-datatables"
   [[module.imports.mounts]]
-    source = "dist"
-    target = "static"
+    source = "dist/simple-datatables.js"
+    target = "assets/js/modules/simple-datatables/simple-datatables.js"
   [[module.imports.mounts]]
-    source = "layouts"
-    target = "layouts"
+    source = "dist/simple-datatables.scss"
+    target = "assets/scss/simple-datatables.scss"
+  [[module.imports.mounts]]
+    source = "assets"
+    target = "assets"
+  [[module.imports.mounts]]
+    source = 'i18n'
+    target = 'i18n'
+
+[markup.goldmark.renderer]
+  unsafe = true

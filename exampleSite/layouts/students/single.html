@@ -1,0 +1,13 @@
+{{ define "main" }}
+<div class="container-xxl p-5">
+  <h1>{{ .Title }}</h1>
+
+  <p>
+    City: {{ .Params.City }}<br>
+    Ext.: {{ .Params.Ext }}<br>
+    Start date: {{ .Date | time.Format ":date_long"  }}
+  </p>
+
+  {{with .Parent }}<div><a href="{{ .RelPermalink }}">Back</a></div>{{ end }}
+</div>
+{{ end }}

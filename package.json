@@ -1,10 +1,12 @@
 {
-  "name": "@gethinode/mod-template",
+  "name": "@gethinode/mod-simple-datatables",
   "version": "0.0.0",
-  "description": "A template to define a Hugo module compatible with Hinode",
+  "description": "A Hugo module to enhance tables powered by simple-datatables to your Hinode site (work in progress)",
   "keywords": [
     "hugo",
-    "module"
+    "module",
+    "hinode",
+    "table"
   ],
   "main": "index.js",
   "publishConfig": {
@@ -21,14 +23,14 @@
     "mod:update": "rimraf _vendor && hugo mod get -u ./... && hugo mod get -u && npm run -s mod:vendor && npm run -s mod:tidy",
     "mod:tidy": "hugo mod tidy",
     "mod:vendor": "rimraf _vendor && hugo mod vendor",
-    "postinstall": "echo TODO: add postinstall instructions",
+    "postinstall": "cpy node_modules/simple-datatables/dist/style.css dist --rename=simple-datatables.scss --flat && cpy node_modules/simple-datatables/dist/umd/simple-datatables.js dist --rename=simple-datatables.js --flat",
     "test": "npm run -s build",
     "upgrade": "npx npm-check-updates -u && npm run -s mod:update",
     "prepare": "node .husky/install.mjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gethinode/mod-template.git"
+    "url": "git+https://github.com/gethinode/mod-simple-datatables.git"
   },
   "author": "Mark Dumay",
   "license": "MIT",
@@ -47,7 +49,8 @@
     "hugo-bin": "^0.125.2",
     "husky": "^9.0.11",
     "rimraf": "^6.0.0",
-    "semantic-release": "^24.0.0"
+    "semantic-release": "^24.0.0",
+    "simple-datatables": "^9.0.4"
   },
   "hugo-bin": {
     "buildTags": "extended"

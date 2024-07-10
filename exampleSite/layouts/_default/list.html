@@ -1,7 +1,32 @@
 {{ define "main" }}
-  <h1>{{ .Title }}</h1>
-  {{ .Content }}
-  {{ range .Pages }}
-    <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-  {{ end }}
+  <div class="container-xxl p-5">
+    <h1>{{ .Title }}</h1>
+
+    <table id="demo-table1" class="data-table"
+      data-table-sortable="true"
+      data-table-paging="true"
+      data-table-searchable="false"
+    >
+      <thead>
+        <tr>
+          <th >#</th>
+          <th data-sortable="true">Name</th>
+          <th>Ext.</th>
+          <th>City</th>
+          <th data-type="date" data-format="MM/DD/YY">Start Date</th>
+        </tr>
+      </thead>
+      <tbody>
+          {{ range $index, $item := .Site.RegularPages }}
+            <tr>
+              <td>{{ add $index 1 }} </td>
+              <td><a href="{{ $item.RelPermalink }}">{{ $item.Title }}</a></td>
+              <td>{{ $item.Params.Ext }}</td>
+              <td>{{ $item.Params.City }}</td>
+              <td>{{ $item.Date | time.Format "01/02/06" }}</td>
+            </tr>
+          {{ end }}
+      </tbody>
+    </table>
+  </div>
 {{ end }}
