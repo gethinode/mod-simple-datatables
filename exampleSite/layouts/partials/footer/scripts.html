@@ -1,0 +1,16 @@
+{{- $filename := .filename | default "js/main.bundle.js" -}}
+{{- $match := .match | default "js/**.js" -}}
+{{- $page := .page -}}
+
+{{- warnf "Processing js pattern: %s" $match -}}
+{{ $files := sort (resources.Match $match) "Key" "asc" }}
+{{- range $index, $file := $files -}}
+    {{- warnf " - Processing file: %s" $file.Key }}
+{{- end -}}
+
+{{ if gt (len $files) 0 }}
+    {{ $bundle := $files | resources.Concat $filename -}}
+    {{ $js := $bundle | resources.ExecuteAsTemplate $filename $page -}}
+
+    <script src="{{ $js.Permalink }}"></script>
+{{ end -}}

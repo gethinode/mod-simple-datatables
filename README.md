@@ -1,8 +1,8 @@
-# Hinode Module - Template
+# Hinode Module - Simple Datatables
 
 <!-- Tagline -->
 <p align="center">
-    <b>A template to define a Hugo module compatible with Hinode</b>
+    <b>A Hugo module to enhance tables powered by simple-datatables to your Hinode site (work in progress)</b>
     <br />
 </p>
 
@@ -14,17 +14,17 @@
     <a href="https://gethinode.com" alt="Hinode theme">
         <img src="https://img.shields.io/badge/theme-hinode-blue">
     </a>
-    <a href="https://github.com/gethinode/mod-template/commits/main" alt="Last commit">
-        <img src="https://img.shields.io/github/last-commit/gethinode/mod-template.svg">
+    <a href="https://github.com/gethinode/mod-simple-datatables/commits/main" alt="Last commit">
+        <img src="https://img.shields.io/github/last-commit/gethinode/mod-simple-datatables.svg">
     </a>
-    <a href="https://github.com/gethinode/mod-template/issues" alt="Issues">
-        <img src="https://img.shields.io/github/issues/gethinode/mod-template.svg">
+    <a href="https://github.com/gethinode/mod-simple-datatables/issues" alt="Issues">
+        <img src="https://img.shields.io/github/issues/gethinode/mod-simple-datatables.svg">
     </a>
-    <a href="https://github.com/gethinode/mod-template/pulls" alt="Pulls">
-        <img src="https://img.shields.io/github/issues-pr-raw/gethinode/mod-template.svg">
+    <a href="https://github.com/gethinode/mod-simple-datatables/pulls" alt="Pulls">
+        <img src="https://img.shields.io/github/issues-pr-raw/gethinode/mod-simple-datatables.svg">
     </a>
-    <a href="https://github.com/gethinode/mod-template/blob/main/LICENSE" alt="License">
-        <img src="https://img.shields.io/github/license/gethinode/mod-template">
+    <a href="https://github.com/gethinode/mod-simple-datatables/blob/main/LICENSE" alt="License">
+        <img src="https://img.shields.io/github/license/gethinode/mod-simple-datatables">
     </a>
 </p>
 
@@ -32,23 +32,27 @@
 
 ![Logo](https://raw.githubusercontent.com/gethinode/hinode/main/static/img/logo.png)
 
-Hinode is a clean blog theme for [Hugo][hugo], an open-source static site generator. Hinode is available as a [template][repository_template], and a [main theme][repository]. <!-- This repository maintains a Hugo module to add [module][module] to a Hinode site. --> Visit the Hinode documentation site for [installation instructions][hinode_docs].
+Hinode is a clean blog theme for [Hugo][hugo], an open-source static site generator. Hinode is available as a [template][repository_template], and a [main theme][repository]. This repository maintains a Hugo module to add [simple-datatables][simple-datatables] to a Hinode site. Visit the Hinode documentation site for [installation instructions][hinode_docs].
 
 ## Contributing
 
 This module uses [semantic-release][semantic-release] to automate the release of new versions. The package uses `husky` and `commitlint` to ensure commit messages adhere to the [Conventional Commits][conventionalcommits] specification. You can run `npx git-cz` from the terminal to help prepare the commit message.
 
-<!-- ## Configuration
+## Usage
 
-This module supports the following parameters (see the section `params.modules` in `config.toml`):
+Simple datatables is compatible with Bootstrap tables. It uses Hugo's `i18n` folder for the translation tables of [multilingual sites][hugo_multilingual]. Add the attribute `data-table` to the class of any table. The following arguments are supported:
 
-| Setting                   | Default | Description |
-|---------------------------|---------|-------------| -->
+| Argument              | Default | Description |
+|-----------------------|---------|-------------|
+| data-table-sortable   | `true`  | Toggle the ability to sort the columns. |
+| data-table-paging     | `true`  | Whether paging is enabled for the table. |
+| data-table-searchable | `true`  | Toggle the ability to search the dataset. |
 
 <!-- MARKDOWN LINKS -->
 [hugo]: https://gohugo.io
+[hugo_multilingual]: https://gohugo.io/content-management/multilingual/
 [hinode_docs]: https://gethinode.com
-<!-- [module]: https://example.com -->
+[simple-datatables]: https://github.com/fiduswriter/simple-datatables/tree/main
 [repository]: https://github.com/gethinode/hinode.git
 [repository_template]: https://github.com/gethinode/template.git
 [conventionalcommits]: https://www.conventionalcommits.org

@@ -1,8 +1,15 @@
 [module]
   [module.hugoVersion]
     extended = true
-    min = "0.110.0"
+    min = "0.126.0"
     max = ""
+  [[module.mounts]]
+    source = "dist/simple-datatables.js"
+    target = "assets/js/modules/simple-datatables/simple-datatables.js"
+  [[module.mounts]]
+    source = "dist"
+    target = "assets/scss"
+    includeFiles = "simple-datatables.scss"
   [[module.mounts]]
     source = 'layouts'
     target = 'layouts'
@@ -10,5 +17,16 @@
     source = 'assets'
     target = 'assets'
   [[module.mounts]]
+    source = 'i18n'
+    target = 'i18n'
+  [[module.mounts]]
     source = 'static'
     target = 'static'
+  [[module.imports]]
+    path = "github.com/gethinode/mod-bootstrap"
+  [[module.imports]]
+    path = "github.com/gethinode/mod-utils/v2"
+
+[params.modules.simple-datatables]
+  integration = "optional"
+  state = "async"

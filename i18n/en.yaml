@@ -1,0 +1,12 @@
+- id: tablePlaceholder
+  translation: "Search..."
+- id: tablesSearchTitle
+  translation: "Search within table"
+- id: tablesPerPage
+  translation: "entries per page"
+- id: tablesNoRows
+  translation: "No entries found"
+- id: tablesNoResults
+  translation: "No results match your search query"
+- id: tablesInfo
+  translation: "Showing {start} to {end} of {rows} entries"

@@ -4,11 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0">
   <title>{{ with .Title }}{{ printf "%s | " . }}{{ end }}{{ site.Title }}</title>
-  <link rel=stylesheet href="style.css">
+  {{ partial "head/stylesheet.html" -}}
 </head>
 <body>
 {{ block "main" . }}
 
 {{ end }}
+{{- partial "footer/scripts.html" (dict "page" .) }}
 </body>
 </html>
