@@ -22,3 +22,43 @@ title = 'Test site for mod-simple-datatables'
 
 [markup.goldmark.renderer]
   unsafe = true
+
+[[server.headers]]
+for = '/**'
+[server.headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Content-Security-Policy = """\
+        default-src 'self'; \
+        script-src 'self'; \
+        style-src 'self';  \
+        object-src 'none'; \
+        base-uri 'self'; \
+        connect-src 'self';\
+        font-src 'self'; \
+        frame-src 'self'; \
+        img-src 'self'; \
+        manifest-src; \
+        media-src 'self' \
+        """
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin"
+    Permissions-Policy = """\
+        geolocation=(), \
+        midi=(), \
+        sync-xhr=(), \
+        microphone=(), \
+        camera=(), \
+        magnetometer=(), \
+        gyroscope=(), \
+        fullscreen=(), \
+        payment=() \
+        """
+    cache-control = """\
+        max-age=0, \
+        no-cache, \
+        no-store, \
+        must-revalidate \
+        """
+    Access-Control-Allow-Origin = "*"
