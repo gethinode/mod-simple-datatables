@@ -23,7 +23,8 @@
     "mod:update": "rimraf _vendor && hugo mod get -u ./... && hugo mod get -u && npm run -s mod:vendor && npm run -s mod:tidy",
     "mod:tidy": "hugo mod tidy",
     "mod:vendor": "rimraf _vendor && hugo mod vendor",
-    "postinstall": "cpy node_modules/simple-datatables/dist/style.css dist --rename=simple-datatables.scss --flat && cpy node_modules/simple-datatables/dist/umd/simple-datatables.js dist --rename=simple-datatables.js --flat",
+    "postinstall": "cpy node_modules/simple-datatables/dist/style.css dist --rename=simple-datatables.scss --flat && cpy node_modules/simple-datatables/dist/umd/simple-datatables.js dist --rename=simple-datatables.js --flat && npm run update:js",
+    "update:js": "replace-in-files --string=\"f.style=c(f.style,t)\" --replacement=\"\" dist/simple-datatables.js",
     "test": "npm run -s build",
     "upgrade": "npx npm-check-updates -u && npm run -s mod:update",
     "prepare": "node .husky/install.mjs"
@@ -48,6 +49,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "hugo-bin": "^0.125.2",
     "husky": "^9.0.11",
+    "replace-in-files-cli": "^3.0.0",
     "rimraf": "^6.0.1",
     "semantic-release": "^24.0.0",
     "simple-datatables": "^9.0.4"

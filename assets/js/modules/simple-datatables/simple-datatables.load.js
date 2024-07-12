@@ -39,7 +39,6 @@ let tableOptions = {
     ""
     }
     </div>
-    <div class='${options.classes.container}'${options.scrollY.length ? ` style='height: ${options.scrollY}; overflow-Y: auto;'` : ""}></div>
     <div class='${options.classes.bottom}'>
     ${
     options.paging ?
