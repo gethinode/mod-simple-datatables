@@ -52,7 +52,7 @@
     "replace-in-files-cli": "^3.0.0",
     "rimraf": "^6.0.1",
     "semantic-release": "^24.1.0",
-    "simple-datatables": "^9.0.4"
+    "simple-datatables": "^9.1.0"
   },
   "hugo-bin": {
     "buildTags": "extended"
