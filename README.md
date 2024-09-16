@@ -2,7 +2,7 @@
 
 <!-- Tagline -->
 <p align="center">
-    <b>A Hugo module to enhance tables powered by simple-datatables to your Hinode site (work in progress)</b>
+    <b>A Hugo module to enhance tables powered by simple-datatables to your Hinode site</b>
     <br />
 </p>
 
