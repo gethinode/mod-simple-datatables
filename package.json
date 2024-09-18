@@ -1,6 +1,6 @@
 {
   "name": "@gethinode/mod-simple-datatables",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "A Hugo module to enhance tables powered by simple-datatables to your Hinode site (work in progress)",
   "keywords": [
     "hugo",
