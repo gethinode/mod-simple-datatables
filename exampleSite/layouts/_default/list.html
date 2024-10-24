@@ -5,7 +5,9 @@
     <table id="demo-table1" class="data-table"
       data-table-sortable="true"
       data-table-paging="true"
-      data-table-searchable="false"
+      data-table-searchable="true"
+      data-table-perPage="5"
+      data-table-perPageSelect='[5, 10, 30, 100, ["{{ T "tablePerPageSelectAll" }}", -1]]'
     >
       <thead>
         <tr>

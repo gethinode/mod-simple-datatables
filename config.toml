@@ -30,3 +30,4 @@
 [params.modules.simple-datatables]
   integration = "optional"
   state = "async"
+  localize = true
