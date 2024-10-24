@@ -1,5 +1,5 @@
 baseURL = 'http://example.org/'
-languageCode = 'en-us'
+languageCode = 'nl'
 title = 'Test site for mod-simple-datatables'
 
 [module]
@@ -38,9 +38,10 @@ for = '/**'
         connect-src 'self';\
         font-src 'self'; \
         frame-src 'self'; \
-        img-src 'self'; \
+        img-src 'self' data:; \
         manifest-src; \
         media-src 'self' \
+        
         """
     X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin"
