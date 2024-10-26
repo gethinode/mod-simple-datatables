@@ -57,9 +57,15 @@ document.querySelectorAll('.data-table').forEach(tbl => {
     tableOptions.paging = paging
     let searchable = (tbl.getAttribute('data-table-searchable') === 'true')
     tableOptions.searchable = searchable
+<<<<<<< HEAD
     let perPage = parseInt(tbl.getAttribute('data-table-paging-option-perPage')) || 10
     tableOptions.perPage = perPage
     let perPageSelectAttr = tbl.getAttribute('data-table-paging-option-perPageSelect');
+=======
+    let perPage = tbl.getAttribute('data-table-perPage') || 10
+    tableOptions.perPage = perPage
+    let perPageSelectAttr = tbl.getAttribute('data-table-perPageSelect');
+>>>>>>> a3d96cc93cfa4b859338ebe76c67175eb3e4384e
     let perPageSelect;
     if (perPageSelectAttr) {
         try {
