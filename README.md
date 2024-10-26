@@ -46,6 +46,8 @@ Simple datatables is compatible with Bootstrap tables. It uses Hugo's `i18n` fol
 |-----------------------|---------|-------------|
 | data-table-sortable   | `true`  | Toggle the ability to sort the columns. |
 | data-table-paging     | `true`  | Whether paging is enabled for the table. |
+| data-table-paging-option-perPage     | `10`  | Paging option: Sets the maximum number of rows to display on each page. Type: int  |
+| data-table-paging-option-perPageSelect     | `[5, 10, 20, 50, ["{{ T "tablePerPageSelectAll" }}", -1]]`  | Paging option: Sets the per page options in the dropdown. |
 | data-table-searchable | `true`  | Toggle the ability to search the dataset. |
 
 <!-- MARKDOWN LINKS -->

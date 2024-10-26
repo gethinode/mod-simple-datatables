@@ -44,8 +44,7 @@ let tableOptions = {
                 }
             }
             innerHeader.attributes.class = innerHeaderClass
-        })
-    
+        })    
         return table
     }
 }    
@@ -58,9 +57,9 @@ document.querySelectorAll('.data-table').forEach(tbl => {
     tableOptions.paging = paging
     let searchable = (tbl.getAttribute('data-table-searchable') === 'true')
     tableOptions.searchable = searchable
-    let perPage = tbl.getAttribute('data-table-perPage') || 10
+    let perPage = parseInt(tbl.getAttribute('data-table-paging-option-perPage')) || 10
     tableOptions.perPage = perPage
-    let perPageSelectAttr = tbl.getAttribute('data-table-perPageSelect');
+    let perPageSelectAttr = tbl.getAttribute('data-table-paging-option-perPageSelect');
     let perPageSelect;
     if (perPageSelectAttr) {
         try {
