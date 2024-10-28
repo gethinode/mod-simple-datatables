@@ -11,4 +11,4 @@
 - id: tablesInfo
   translation: "Toon {start} tot {end} van {rows} resultaten"
 - id: tablePerPageSelectAll
-  translation: "Alle"
+  translation: "Alles"
