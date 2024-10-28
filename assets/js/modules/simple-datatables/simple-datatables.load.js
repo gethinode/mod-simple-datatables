@@ -2,7 +2,6 @@
 
 
 let tableOptions = {
-    perPage: 10,
     locale: "{{ site.Language.Lang | default "en" }}",
     labels: {
       placeholder: "{{ T "tablePlaceholder" }}",
@@ -12,41 +11,16 @@ let tableOptions = {
       noResults: "{{ T "tablesNoResults" }}",
       info: "{{ T "tablesInfo" }}"
     },
-    // perPageSelect: [5, 10, 15, ["All", -1]],
     classes: {
         active: "active",
         disabled: "disabled",
         selector: "form-select",
         paginationList: "pagination",
         paginationListItem: "page-item",
-        paginationListItemLink: "page-link"
+        paginationListItemLink: "page-link",
+        input: "form-control search-input",
+        search: "float-right search-data-table btn-group"
     },
-    template: options => `<div class='${options.classes.top} fixed-table-toolbar'>
-    ${
-    options.paging && options.perPageSelect ?
-    `<div class='${options.classes.dropdown} bs-bars float-left'>
-    <label>
-    <select class='${options.classes.selector}'></select>
-    </label>
-    </div>` :
-    ""
-    }
-    ${
-    options.searchable ?
-    `<div class='${options.classes.search} float-right search btn-group'>
-    <input class='${options.classes.input} form-control search-input' placeholder='Search' type='search' title='Search within table'>
-    </div>` :
-    ""
-    }
-    </div>
-    <div class='${options.classes.bottom}'>
-    ${
-    options.paging ?
-    `<div class='${options.classes.info}'></div>` :
-    ""
-    }
-    <nav class='${options.classes.pagination}'></nav>
-    </div>`,
     tableRender: (_data, table, _type) => {
         // ignore type ('main', 'print', 'header', 'message')
         const thead = table.childNodes[0]
@@ -70,21 +44,36 @@ let tableOptions = {
                 }
             }
             innerHeader.attributes.class = innerHeaderClass
-        })
-    
+        })    
         return table
     }
 }    
 
+
 document.querySelectorAll('.data-table').forEach(tbl => {
     let sortable = (tbl.getAttribute('data-table-sortable') === 'true')
+    tableOptions.sortable = sortable
     let paging = (tbl.getAttribute('data-table-paging') === 'true')
+    tableOptions.paging = paging
     let searchable = (tbl.getAttribute('data-table-searchable') === 'true')
+    tableOptions.searchable = searchable
+    let perPage = parseInt(tbl.getAttribute('data-table-paging-option-perPage')) || 10
+    tableOptions.perPage = perPage
+    let perPageSelectAttr = tbl.getAttribute('data-table-paging-option-perPageSelect');
+    let perPageSelect;
+    if (perPageSelectAttr) {
+        try {
+            perPageSelect = JSON.parse(perPageSelectAttr);
+        } catch (e) {
+            console.error('Error parsing perPageSelect, use default value:', e);
+            perPageSelect = [5, 10, 20, 50, ["{{ T "tablePerPageSelectAll" }}", -1]];
+        }
+    } else {
+        perPageSelect = [5, 10, 20, 50, ["{{ T "tablePerPageSelectAll" }}", -1]];
+    }
+    tableOptions.perPageSelect = perPageSelect;
 
-    new window.simpleDatatables.DataTable(tbl, {
-        sortable: sortable,
-        paging: paging, 
-        searchable: searchable,
-        tableOptions
-    })
+    new window.simpleDatatables.DataTable(tbl, tableOptions)
 })
+
+

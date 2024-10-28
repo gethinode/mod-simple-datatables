@@ -10,3 +10,5 @@
   translation: "Geen resultaten voor zoekopdracht"
 - id: tablesInfo
   translation: "Toon {start} tot {end} van {rows} resultaten"
+- id: tablePerPageSelectAll
+  translation: "Alles"

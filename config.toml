@@ -30,3 +30,7 @@
 [params.modules.simple-datatables]
   integration = "optional"
   state = "async"
+  localize = true
+
+[params.modules.simple-datatables.csp]
+  img-src = ["data:"]

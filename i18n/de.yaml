@@ -1,0 +1,14 @@
+- id: tablePlaceholder
+  translation: "Suche..."
+- id: tablesSearchTitle
+  translation: "Suche in der Tabelle"
+- id: tablesPerPage
+  translation: "Zeilen pro Seite"
+- id: tablesNoRows
+  translation: "Keine Zeilen vorhanden"
+- id: tablesNoResults
+  translation: "Kein Ergebnis für die Suchanfrage"
+- id: tablesInfo
+  translation: "Anzeige: ({start} - {end}) von {rows} Zeilen"
+- id: tablePerPageSelectAll
+  translation: "Alle"

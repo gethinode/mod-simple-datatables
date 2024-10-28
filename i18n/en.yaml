@@ -10,3 +10,6 @@
   translation: "No results match your search query"
 - id: tablesInfo
   translation: "Showing {start} to {end} of {rows} entries"
+- id: tablePerPageSelectAll
+  translation: "All"
+ 
