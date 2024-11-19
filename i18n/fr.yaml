@@ -1,0 +1,15 @@
+- id: tablePlaceholder
+  translation: "Rechercher..."
+- id: tablesSearchTitle
+  translation: "Recherche dans le tableau"
+- id: tablesPerPage
+  translation: "entrées par page"
+- id: tablesNoRows
+  translation: "Aucune entrée trouvée"
+- id: tablesNoResults
+  translation: "Aucun résultat ne correspond à votre recherche"
+- id: tablesInfo
+  translation: "Affichage des entrées de {start} à {end} sur {rows}"
+- id: tablePerPageSelectAll
+  translation: "Tout"
+ 
