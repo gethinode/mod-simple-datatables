@@ -30,6 +30,8 @@ github.com/gethinode/mod-simple-datatables v1.1.0 h1:Qc8eJOcVjxIHNfgrZf/bKe8+spC
 github.com/gethinode/mod-simple-datatables v1.1.0/go.mod h1:8q/6f3uAPNTTP5NjEJOuXr6tEWelRFLJfzVJ3AODMlQ=
 github.com/gethinode/mod-simple-datatables v1.1.1 h1:rzX3+rsOfcW9Z8wiQ1Fp6Ry5TkcJ0nG849xKzjDBbGE=
 github.com/gethinode/mod-simple-datatables v1.1.1/go.mod h1:8q/6f3uAPNTTP5NjEJOuXr6tEWelRFLJfzVJ3AODMlQ=
+github.com/gethinode/mod-simple-datatables v1.1.3 h1:a+uIfgc6c+9Zc38Q+Kzd3cWeFhC8BW/rP9/rnd2/ZKM=
+github.com/gethinode/mod-simple-datatables v1.1.3/go.mod h1:8q/6f3uAPNTTP5NjEJOuXr6tEWelRFLJfzVJ3AODMlQ=
 github.com/gethinode/mod-utils/v2 v2.3.10 h1:+coUXdgAbLEE8Tvb3Rfk/1Nr6oDVreXI2sil0pa/n2Q=
 github.com/gethinode/mod-utils/v2 v2.3.10/go.mod h1:GTYeknoLujNjfDxI+V9Dcug26CYJSTJ0B/U2dagw9oY=
 github.com/gethinode/mod-utils/v2 v2.4.0 h1:mmG4hWaeA4krAg933pibH+TrjFmPHkAi/DUbe3SM38I=
