@@ -1,7 +1,7 @@
 [module]
   [module.hugoVersion]
     extended = true
-    min = "0.126.0"
+    min = "0.141.0"
     max = ""
   [[module.mounts]]
     source = "dist/simple-datatables.js"
