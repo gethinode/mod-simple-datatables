@@ -1,11 +1,11 @@
 {{/* Get remote data. */}}
 {{ $data := dict }}
 {{ $url := "https://raw.githubusercontent.com/fiduswriter/simple-datatables/main/docs/demos/5-column-manipulation/datatable.json" }}
-{{ with resources.GetRemote $url }}
+{{ with try (resources.GetRemote $url) }}
     {{ with .Err }}
         {{ errorf "Unable to get remote resource %s: %s" $url . }}
     {{ else }}
-        {{ $data = . | transform.Unmarshal }}
+        {{ $data = .Value | transform.Unmarshal }}
     {{ end }}
 {{ else }}
     {{ errorf "Unable to get remote resource %s" $url }}
