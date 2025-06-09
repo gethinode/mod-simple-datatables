@@ -38,6 +38,8 @@ github.com/gethinode/mod-utils/v3 v3.1.1 h1:hjC/vnq7NF2Kf18qkpeTHiS14bVrNa55avy0
 github.com/gethinode/mod-utils/v3 v3.1.1/go.mod h1:9iHYWiDpDlcyrGAOHniubK/kziJYhTsw7UpGM+u4MOM=
 github.com/gethinode/mod-utils/v3 v3.1.2 h1:nE1tUkeSTOPxaLRoSiQlODbJhekOJsHrKXte5A2jujg=
 github.com/gethinode/mod-utils/v3 v3.1.2/go.mod h1:9iHYWiDpDlcyrGAOHniubK/kziJYhTsw7UpGM+u4MOM=
+github.com/gethinode/mod-utils/v3 v3.1.3 h1:oIpbIUCpVrWb7Axo1TZODWJ2iA6uYZp4rpx8fC7GIXk=
+github.com/gethinode/mod-utils/v3 v3.1.3/go.mod h1:9iHYWiDpDlcyrGAOHniubK/kziJYhTsw7UpGM+u4MOM=
 github.com/twbs/bootstrap v5.3.3+incompatible h1:goFoqinzdHfkeegpFP7pvhbd0g+A3O2hbU3XCjuNrEQ=
 github.com/twbs/bootstrap v5.3.3+incompatible/go.mod h1:fZTSrkpSf0/HkL0IIJzvVspTt1r9zuf7XlZau8kpcY0=
 github.com/twbs/bootstrap v5.3.4+incompatible h1:TBZffBo8JMDCRfaOoDx0aS0YPOprZ2T4XF4ysUS8nYI=
