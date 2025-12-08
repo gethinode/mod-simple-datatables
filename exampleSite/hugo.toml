@@ -6,7 +6,7 @@ title = 'Test site for mod-simple-datatables'
   # Build and serve using local mod-simple-datatables clone declared in the named Hugo workspace:
   workspace = "mod-simple-datatables.work"
   [[module.imports]]
-    path = "github.com/gethinode/mod-simple-datatables"
+    path = "github.com/gethinode/mod-simple-datatables/v3"
   [[module.imports.mounts]]
     source = "dist/simple-datatables.js"
     target = "assets/js/modules/simple-datatables/simple-datatables.js"
