@@ -118,6 +118,8 @@ github.com/gethinode/mod-utils/v5 v5.16.0 h1:RqZZKJ3cyjwCyjrzH93FBnI7zQgr+RZaSRQ
 github.com/gethinode/mod-utils/v5 v5.16.0/go.mod h1:PwQN4oOjA6k/vet11JueJ9asZMgL0DBa3jyS9tPkBWU=
 github.com/gethinode/mod-utils/v5 v5.16.1 h1:WzE+xFKmOGX5zAhJ/udR0BFMEiGSbFVLBX/s/n58Rmo=
 github.com/gethinode/mod-utils/v5 v5.16.1/go.mod h1:PwQN4oOjA6k/vet11JueJ9asZMgL0DBa3jyS9tPkBWU=
+github.com/gethinode/mod-utils/v5 v5.17.0 h1:qwOGyfWWmaSTQBaYrhRNYN/ATuTZ7XXOeAjLETxMGR0=
+github.com/gethinode/mod-utils/v5 v5.17.0/go.mod h1:PwQN4oOjA6k/vet11JueJ9asZMgL0DBa3jyS9tPkBWU=
 github.com/twbs/bootstrap v5.3.3+incompatible h1:goFoqinzdHfkeegpFP7pvhbd0g+A3O2hbU3XCjuNrEQ=
 github.com/twbs/bootstrap v5.3.3+incompatible/go.mod h1:fZTSrkpSf0/HkL0IIJzvVspTt1r9zuf7XlZau8kpcY0=
 github.com/twbs/bootstrap v5.3.4+incompatible h1:TBZffBo8JMDCRfaOoDx0aS0YPOprZ2T4XF4ysUS8nYI=
