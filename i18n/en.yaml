@@ -12,4 +12,8 @@
   translation: "Showing {start} to {end} of {rows} entries"
 - id: tablePerPageSelectAll
   translation: "All"
+- id: tableFilterAll
+  translation: "All"
+- id: tableFilterLabel
+  translation: "Filter"
  
