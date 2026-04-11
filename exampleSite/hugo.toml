@@ -32,7 +32,7 @@ for = '/**'
     Content-Security-Policy = """\
         default-src 'self'; \
         script-src 'self'; \
-        style-src 'self';  \
+        style-src 'self' 'unsafe-inline';  \
         object-src 'none'; \
         base-uri 'self'; \
         connect-src 'self';\
