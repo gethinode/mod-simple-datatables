@@ -12,3 +12,7 @@
   translation: "Anzeige: ({start} - {end}) von {rows} Zeilen"
 - id: tablePerPageSelectAll
   translation: "Alle"
+- id: tableFilterAll
+  translation: "Alle"
+- id: tableFilterLabel
+  translation: "Filter"

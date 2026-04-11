@@ -50,6 +50,11 @@ let tableOptions = {
 }    
 
 
+// Track DataTable instances keyed by filter container ID.
+// An array is used per ID because both the regular and responsive-wrapped
+// table variants need to be filtered together.
+const tableFilterInstances = {}
+
 document.querySelectorAll('.data-table').forEach(tbl => {
     let sortable = (tbl.getAttribute('data-table-sortable') === 'true')
     tableOptions.sortable = sortable
@@ -73,7 +78,58 @@ document.querySelectorAll('.data-table').forEach(tbl => {
     }
     tableOptions.perPageSelect = perPageSelect;
 
-    new window.simpleDatatables.DataTable(tbl, tableOptions)
+    const dt = new window.simpleDatatables.DataTable(tbl, tableOptions)
+
+    // Register instance for category filter integration
+    const filterId = tbl.getAttribute('data-filter-id')
+    if (filterId) {
+        const filterCol = parseInt(tbl.getAttribute('data-filter-col') ?? '1')
+        if (!tableFilterInstances[filterId]) tableFilterInstances[filterId] = []
+        tableFilterInstances[filterId].push({ dt, filterCol })
+    }
+})
+
+// Category filter button group.
+// Uses simple-datatables search(term, columns, source) when a DataTable instance
+// is available, so sorting, pagination and free-text search all continue to work
+// alongside category filtering. Falls back to direct DOM row toggling when no
+// DataTable is active on the table (e.g. filter-only without sortable/paginate/searchable).
+document.querySelectorAll('[data-filter-table]').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const tableId = this.getAttribute('data-filter-table')
+        const filterValue = this.getAttribute('data-filter-value').toLowerCase()
+
+        // Update active button state
+        document.querySelectorAll(`[data-filter-table="${tableId}"]`).forEach(b => {
+            b.classList.toggle('active', b === this)
+        })
+
+        const instances = tableFilterInstances[tableId]
+        if (instances) {
+            // DataTable path — filter persists across sorts and pagination updates.
+            // The named source 'category-filter' is independent of the built-in
+            // search input so both narrow the result set simultaneously.
+            instances.forEach(({ dt, filterCol }) => {
+                dt.search(filterValue, [filterCol], 'category-filter')
+            })
+        } else {
+            // Fallback: direct DOM manipulation (no simple-datatables on this table)
+            document.querySelectorAll(`[data-filter-container="${tableId}"]`).forEach(container => {
+                const table = container.querySelector('table')
+                if (!table) return
+                const col = parseInt(table.getAttribute('data-filter-col') ?? '1')
+                table.querySelectorAll('tbody tr').forEach(row => {
+                    if (!filterValue) {
+                        row.style.display = ''
+                        return
+                    }
+                    const cell = row.cells[col]
+                    const text = cell ? cell.textContent.trim().toLowerCase() : ''
+                    row.style.display = text.includes(filterValue) ? '' : 'none'
+                })
+            })
+        }
+    })
 })
 
 

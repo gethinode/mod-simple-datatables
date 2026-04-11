@@ -15,7 +15,7 @@
           <th data-sortable="true">Name</th>
           <th>Ext.</th>
           <th>City</th>
-          <th data-type="date" data-format="MM/DD/YY">Start Date</th>
+          <th data-type="date" data-format="MM/DD/YY[escaped]">Start Date</th>
         </tr>
       </thead>
       <tbody>
@@ -25,7 +25,7 @@
               <td><a href="{{ $item.RelPermalink }}">{{ $item.Title }}</a></td>
               <td>{{ $item.Params.Ext }}</td>
               <td>{{ $item.Params.City }}</td>
-              <td>{{ $item.Date | time.Format "01/02/06" }}</td>
+              <td>{{ $item.Date | time.Format "01/02/06" }} | {{ $item.Date | time.Format "2006/02/01" }}</td>
             </tr>
           {{ end }}
       </tbody>

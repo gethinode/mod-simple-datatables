@@ -12,3 +12,7 @@
   translation: "Toon {start} tot {end} van {rows} resultaten"
 - id: tablePerPageSelectAll
   translation: "Alles"
+- id: tableFilterAll
+  translation: "Alles"
+- id: tableFilterLabel
+  translation: "Filteren"
