@@ -10,6 +10,8 @@ github.com/gethinode/mod-bootstrap v1.3.4 h1:rBfyUmdslxL+RX76/5hyJYPacfrt6OYrciN
 github.com/gethinode/mod-bootstrap v1.3.4/go.mod h1:MkvQgiA3N2NFiW57TTU60Rn4N6oZjvlBIVgrJE9M0WI=
 github.com/gethinode/mod-bootstrap v1.3.5 h1:bewgYpQex+dBABK0u5PUvW6IoUXLHhi1Yv9hcPzwGVc=
 github.com/gethinode/mod-bootstrap v1.3.5/go.mod h1:CxrYCFzKtBMz3YWG5i/d5jHKCgvUo60NFcCmz2mxCjQ=
+github.com/gethinode/mod-bootstrap v1.3.6 h1:TMNifG5iV6PrrvHPfcIu1Urfdisae/bXmaY1RPhfIIU=
+github.com/gethinode/mod-bootstrap v1.3.6/go.mod h1:CxrYCFzKtBMz3YWG5i/d5jHKCgvUo60NFcCmz2mxCjQ=
 github.com/gethinode/mod-utils/v2 v2.3.10 h1:+coUXdgAbLEE8Tvb3Rfk/1Nr6oDVreXI2sil0pa/n2Q=
 github.com/gethinode/mod-utils/v2 v2.3.10/go.mod h1:GTYeknoLujNjfDxI+V9Dcug26CYJSTJ0B/U2dagw9oY=
 github.com/gethinode/mod-utils/v2 v2.4.0 h1:mmG4hWaeA4krAg933pibH+TrjFmPHkAi/DUbe3SM38I=
