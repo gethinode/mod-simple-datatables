@@ -1,10 +1,6 @@
-module github.com/gethinode/mod-simple-datatables/v3/exampleSite
+module github.com/gethinode/mod-simple-datatables/v4/exampleSite
 
 go 1.19
 
 require (
-	github.com/gethinode/mod-bootstrap v1.3.7 // indirect
-	github.com/gethinode/mod-simple-datatables/v3 v3.1.2 // indirect
-	github.com/gethinode/mod-utils/v5 v5.23.4 // indirect
-	github.com/twbs/bootstrap v5.3.8+incompatible // indirect
 )
