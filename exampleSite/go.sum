@@ -1,7 +1,7 @@
 github.com/gethinode/mod-bootstrap v1.3.7 h1:rbjOg//q7dbsM+TkDQLsyk9LKv93D1RUjtcSkvV55UU=
 github.com/gethinode/mod-bootstrap v1.3.7/go.mod h1:CxrYCFzKtBMz3YWG5i/d5jHKCgvUo60NFcCmz2mxCjQ=
-github.com/gethinode/mod-utils/v6 v6.0.1 h1:EnmMHjqnI/xyHPXFj1SdRLfVxNunJcKLGVtSAAFTQ8w=
-github.com/gethinode/mod-utils/v6 v6.0.1/go.mod h1:E5tO9w3VKaidJpu1nI8zAKmh0bddFHOIIQnudAaXQTs=
+github.com/gethinode/mod-simple-datatables/v4 v4.0.0 h1:Qv+i8Oz2slrAjKlngnIal02wMrSQVDh4r5fh8dkDXa8=
+github.com/gethinode/mod-simple-datatables/v4 v4.0.0/go.mod h1:s/g95xKr/GUqJ90EXydgXS8YpyBxH6URj9HyMIq0VVk=
 github.com/gethinode/mod-utils/v6 v6.4.0 h1:l49KrawKE/7c6XE00wXQ9T5/kuTfiETerBz6OWn3SJc=
 github.com/gethinode/mod-utils/v6 v6.4.0/go.mod h1:E5tO9w3VKaidJpu1nI8zAKmh0bddFHOIIQnudAaXQTs=
 github.com/twbs/bootstrap v5.3.8+incompatible h1:eK1fsXP7R/FWFt+sSNmmvUH9usPocf240nWVw7Dh02o=
