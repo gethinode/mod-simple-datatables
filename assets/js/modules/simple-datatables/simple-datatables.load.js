@@ -191,10 +191,11 @@ document.querySelectorAll('.data-table').forEach(tbl => {
 })
 
 // Category filter button group.
-// Filtering runs through simple-datatables' search(term, columns, source), so it composes with
-// sorting, pagination and the free-text search: the named source 'category-filter' is independent
-// of the search input, so both narrow the result set at once. Hinode marks every filtered table as
-// a data table, so an instance always exists by the time a button can be clicked.
+// Picking a category calls simple-datatables' search(term, [filterCol], 'category-filter'), so it
+// composes with sorting, pagination and the free-text search: the named source 'category-filter'
+// is independent of the search input, so both narrow the result set at once. Clearing the filter
+// ('All') instead calls multiSearch([], 'category-filter') - see below for why. Hinode marks every
+// filtered table as a data table, so an instance always exists by the time a button can be clicked.
 document.querySelectorAll('[data-filter-table]').forEach(btn => {
     btn.addEventListener('click', function () {
         const tableId = this.getAttribute('data-filter-table')
