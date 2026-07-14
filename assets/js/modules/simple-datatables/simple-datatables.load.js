@@ -209,7 +209,16 @@ document.querySelectorAll('[data-filter-table]').forEach(btn => {
         if (!instances) return
 
         instances.forEach(({ dt, filterCol }) => {
-            dt.search(filterValue, [filterCol], 'category-filter')
+            if (filterValue) {
+                dt.search(filterValue, [filterCol], 'category-filter')
+            } else {
+                // `search()` ignores its `source` argument on the empty-term path: it resets every
+                // query, wiping a term the visitor typed into the search box along with the
+                // category filter. `multiSearch(queries, source)` drops only the queries carrying
+                // that source and re-concats the rest, so clearing the filter with 'All' leaves a
+                // free-text search in place.
+                dt.multiSearch([], 'category-filter')
+            }
         })
     })
 })
