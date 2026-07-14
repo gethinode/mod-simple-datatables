@@ -44,7 +44,19 @@ const wrapLastColumn = (table) => {
         return table
     }
 
-    headerRow.childNodes = headerRow.childNodes.slice(0, -1)
+    // Hides the heading of the wrapped column, rather than removing it. The library measures column
+    // widths by walking the rendered `<th>` list in lockstep with its row model, so the header must
+    // keep all of its cells. This mirrors Hinode's plain-table wrap, which hides the heading too.
+    const lastHeader = headerRow.childNodes.length - 1
+    headerRow.childNodes = headerRow.childNodes.map((th, index) => index !== lastHeader
+        ? th
+        : {
+            ...th,
+            attributes: {
+                ...th.attributes,
+                class: `${th.attributes?.class ?? ""} d-none`.trim()
+            }
+        })
 
     // Marks the table for the wrap-specific striping rules in Hinode's SCSS.
     table.attributes = {
@@ -73,6 +85,9 @@ const wrapLastColumn = (table) => {
             },
             {
                 nodeName: "TR",
+                // Carries the source row's attributes, so `data-index` survives on the synthesized
+                // row and the library's row-selection handler keeps reporting the right record.
+                attributes: { ...row.attributes },
                 childNodes: [{
                     ...last,
                     attributes: { ...last.attributes, colspan: String(span) }
