@@ -191,10 +191,10 @@ document.querySelectorAll('.data-table').forEach(tbl => {
 })
 
 // Category filter button group.
-// Uses simple-datatables search(term, columns, source) when a DataTable instance
-// is available, so sorting, pagination and free-text search all continue to work
-// alongside category filtering. Falls back to direct DOM row toggling when no
-// DataTable is active on the table (e.g. filter-only without sortable/paginate/searchable).
+// Filtering runs through simple-datatables' search(term, columns, source), so it composes with
+// sorting, pagination and the free-text search: the named source 'category-filter' is independent
+// of the search input, so both narrow the result set at once. Hinode marks every filtered table as
+// a data table, so an instance always exists by the time a button can be clicked.
 document.querySelectorAll('[data-filter-table]').forEach(btn => {
     btn.addEventListener('click', function () {
         const tableId = this.getAttribute('data-filter-table')
@@ -206,30 +206,11 @@ document.querySelectorAll('[data-filter-table]').forEach(btn => {
         })
 
         const instances = tableFilterInstances[tableId]
-        if (instances) {
-            // DataTable path — filter persists across sorts and pagination updates.
-            // The named source 'category-filter' is independent of the built-in
-            // search input so both narrow the result set simultaneously.
-            instances.forEach(({ dt, filterCol }) => {
-                dt.search(filterValue, [filterCol], 'category-filter')
-            })
-        } else {
-            // Fallback: direct DOM manipulation (no simple-datatables on this table)
-            document.querySelectorAll(`[data-filter-container="${tableId}"]`).forEach(container => {
-                const table = container.querySelector('table')
-                if (!table) return
-                const col = parseInt(table.getAttribute('data-filter-col') ?? '1')
-                table.querySelectorAll('tbody tr').forEach(row => {
-                    if (!filterValue) {
-                        row.style.display = ''
-                        return
-                    }
-                    const cell = row.cells[col]
-                    const text = cell ? cell.textContent.trim().toLowerCase() : ''
-                    row.style.display = text.includes(filterValue) ? '' : 'none'
-                })
-            })
-        }
+        if (!instances) return
+
+        instances.forEach(({ dt, filterCol }) => {
+            dt.search(filterValue, [filterCol], 'category-filter')
+        })
     })
 })
 
