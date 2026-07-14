@@ -30,7 +30,11 @@ const styleHeader = (table) => {
 
 // Mirrors Bootstrap's $grid-breakpoints. A wrapped table switches layout below the site's main
 // breakpoint, following Bootstrap's `media-breakpoint-down` convention.
-const breakpoints = { xs: 0, sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 }
+//
+// Hinode concatenates every module's `.load.js` into one classic script, so all of them share a
+// single top-level scope and a duplicate `const` would be a parse-time SyntaxError that takes down
+// the whole bundle. Hence the module-specific name.
+const dataTableBreakpoints = { xs: 0, sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 }
 
 // Moves the last column of every record onto a row of its own, so wide tables stay readable on
 // small devices. This rewrites the virtual DOM only - never the row model - so sorting, searching
@@ -155,7 +159,7 @@ document.querySelectorAll('.data-table').forEach(tbl => {
     let media = null
     if (tbl.getAttribute('data-table-wrap') === 'true') {
         const name = tbl.getAttribute('data-table-wrap-breakpoint') || 'md'
-        const width = breakpoints[name] ?? breakpoints.md
+        const width = dataTableBreakpoints[name] ?? dataTableBreakpoints.md
         media = window.matchMedia(`(max-width: ${width - 0.02}px)`)
     }
 
