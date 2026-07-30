@@ -144,12 +144,29 @@ document.querySelectorAll('.data-table').forEach(tbl => {
         perPageSelect = [5, 10, 20, 50, ["{{ T "tablePerPageSelectAll" }}", -1]];
     }
 
+    const perPage = parseInt(tbl.getAttribute('data-table-paging-option-perPage')) || 10;
+
+    // Keep the per-page control honest. When `perPage` is not one of the offered
+    // options the select falls back to rendering its first entry while the table
+    // pages at the requested size, so the control and the behaviour disagree with
+    // nothing to signal it — the reader sees "5" above a page of 25 rows.
+    // Inserting the value keeps the author's intent and makes the control show it.
+    // Entries may be a bare number or a [label, value] pair (the "All" entry), so
+    // compare against the value in either shape.
+    const perPageValue = entry => (Array.isArray(entry) ? entry[1] : entry);
+    if (!perPageSelect.some(entry => perPageValue(entry) === perPage)) {
+        const numeric = perPageSelect.filter(entry => perPageValue(entry) > 0);
+        const position = numeric.findIndex(entry => perPageValue(entry) > perPage);
+        perPageSelect = perPageSelect.slice();
+        perPageSelect.splice(position === -1 ? numeric.length : position, 0, perPage);
+    }
+
     const options = {
         ...tableOptions,
         sortable: (tbl.getAttribute('data-table-sortable') === 'true'),
         paging: (tbl.getAttribute('data-table-paging') === 'true'),
         searchable: (tbl.getAttribute('data-table-searchable') === 'true'),
-        perPage: parseInt(tbl.getAttribute('data-table-paging-option-perPage')) || 10,
+        perPage: perPage,
         perPageSelect: perPageSelect
     }
 
