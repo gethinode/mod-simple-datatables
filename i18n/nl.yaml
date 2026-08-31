@@ -2,6 +2,10 @@
   translation: "Zoeken..."
 - id: tablesSearchTitle
   translation: "Zoeken in tabel"
+- id: tablesSearchLabel
+  translation: "Zoeken"
+- id: tablesSortHint
+  translation: "Activeer om te sorteren"
 - id: tablesPerPage
   translation: "resultaten per pagina"
 - id: tablesNoRows

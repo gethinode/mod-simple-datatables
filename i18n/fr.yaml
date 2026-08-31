@@ -2,6 +2,10 @@
   translation: "Rechercher..."
 - id: tablesSearchTitle
   translation: "Recherche dans le tableau"
+- id: tablesSearchLabel
+  translation: "Rechercher"
+- id: tablesSortHint
+  translation: "Activer pour trier"
 - id: tablesPerPage
   translation: "entrées par page"
 - id: tablesNoRows
