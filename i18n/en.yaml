@@ -2,6 +2,10 @@
   translation: "Search..."
 - id: tablesSearchTitle
   translation: "Search within table"
+- id: tablesSearchLabel
+  translation: "Search"
+- id: tablesSortHint
+  translation: "Activate to sort"
 - id: tablesPerPage
   translation: "entries per page"
 - id: tablesNoRows

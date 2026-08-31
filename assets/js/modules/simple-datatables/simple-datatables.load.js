@@ -189,6 +189,14 @@ let tableOptions = {
     labels: {
       placeholder: "{{ T "tablePlaceholder" }}",
       searchTitle: "{{ T "tablesSearchTitle" }}",
+      // The search label sits inside the `<label>` that wraps the search input, so on screen it
+      // just repeats the input's own placeholder. Hiding it through `classes.searchLabel` would
+      // take the input down with it - the input is a child of that label - so the text carries the
+      // utility class instead. The library assigns its template with `innerHTML`, which is why
+      // markup in a label is honoured. This keeps the label bound to the input, and with it the
+      // input's accessible name, while leaving only the placeholder visible.
+      searchLabel: `<span class="visually-hidden">{{ T "tablesSearchLabel" }}</span>`,
+      sortHint: "{{ T "tablesSortHint" }}",
       perPage: "{{ T "tablesPerPage" }}",
       noRows: "{{ T "tablesNoRows" }}",
       noResults: "{{ T "tablesNoResults" }}",
