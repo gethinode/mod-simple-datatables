@@ -44,5 +44,7 @@ github.com/gethinode/mod-utils/v6 v6.12.1 h1:oj02+wlFvGFR98tqiB2rphxs5usEU300AYc
 github.com/gethinode/mod-utils/v6 v6.12.1/go.mod h1:E5tO9w3VKaidJpu1nI8zAKmh0bddFHOIIQnudAaXQTs=
 github.com/gethinode/mod-utils/v6 v6.13.1 h1:OxmN0zPtzmtSe3vliN5NC4Rgv+t3sFLJlfHPwmYfiTs=
 github.com/gethinode/mod-utils/v6 v6.13.1/go.mod h1:E5tO9w3VKaidJpu1nI8zAKmh0bddFHOIIQnudAaXQTs=
+github.com/gethinode/mod-utils/v6 v6.14.1 h1:wQil4BBR4urcRIGPc4vnX5AsPCOUwlH7eXh4xbC6Ih0=
+github.com/gethinode/mod-utils/v6 v6.14.1/go.mod h1:E5tO9w3VKaidJpu1nI8zAKmh0bddFHOIIQnudAaXQTs=
 github.com/twbs/bootstrap v5.3.8+incompatible h1:eK1fsXP7R/FWFt+sSNmmvUH9usPocf240nWVw7Dh02o=
 github.com/twbs/bootstrap v5.3.8+incompatible/go.mod h1:fZTSrkpSf0/HkL0IIJzvVspTt1r9zuf7XlZau8kpcY0=
