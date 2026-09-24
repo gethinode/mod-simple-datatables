@@ -12,7 +12,7 @@ title = 'Test site for mod-simple-datatables'
     target = "assets/js/modules/simple-datatables/simple-datatables.js"
   [[module.imports.mounts]]
     source = "dist/simple-datatables.scss"
-    target = "assets/scss/simple-datatables.scss"
+    target = "assets/scss/modules/simple-datatables/simple-datatables.scss"
   [[module.imports.mounts]]
     source = "assets"
     target = "assets"

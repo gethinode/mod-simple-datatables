@@ -6,9 +6,11 @@
   [[module.mounts]]
     source = "dist/simple-datatables.js"
     target = "assets/js/modules/simple-datatables/simple-datatables.js"
+  # The library's stylesheet is imported by assets/scss/simple-datatables.scss, which adds the
+  # module's own rules on top of it.
   [[module.mounts]]
     source = "dist"
-    target = "assets/scss"
+    target = "assets/scss/modules/simple-datatables"
     includeFiles = "simple-datatables.scss"
   [[module.mounts]]
     source = 'layouts'
