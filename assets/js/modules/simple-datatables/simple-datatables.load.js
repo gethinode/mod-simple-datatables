@@ -9,6 +9,22 @@ const styleHeader = (table) => {
             th.attributes = {}
         }
         th.attributes.scope = "col"
+        if (!th.childNodes?.length) {
+            return
+        }
+        // A header that is not sortable (`data-sort="false"`, or a table without sorting) holds its
+        // heading directly, so its first child can be a text (or comment) node rather than the
+        // library's sorter button - a plain-text heading always starts with one, while a heading
+        // that starts with an element keeps the class on that element. Any other heading moves into a `span` that carries the `th-inner` class instead, just as the
+        // sorter button holds a sortable one: only an element can carry a class.
+        // Setting it on the text node itself does not merely go unrendered -
+        // diffDOM cannot apply an attribute to a text node, stops patching the live table at that
+        // diff and drops every later one, while the library records the render as applied. The body
+        // is then left half-patched, and every later render (a sort, say) diffs against rows the page
+        // does not show, so rows come out scrambled, duplicated or missing.
+        if (th.childNodes[0].nodeName.startsWith("#")) {
+            th.childNodes = [{ nodeName: "SPAN", attributes: {}, childNodes: th.childNodes }]
+        }
         const innerHeader = th.childNodes[0]
         if (!innerHeader.attributes) {
             innerHeader.attributes = {}
