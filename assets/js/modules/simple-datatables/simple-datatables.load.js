@@ -219,7 +219,25 @@ let tableOptions = {
 // tables can share one filter button group.
 const tableFilterInstances = {}
 
-document.querySelectorAll('.data-table').forEach(tbl => {
+// Returns the media query under which a wrapped table renders its trailing columns on rows of their
+// own, or null when the table does not wrap. At `xs` the max-width evaluates below zero, so the
+// query never matches and wrapping is off - matching Hinode, which does not emit the attribute at
+// `xs` either.
+const dataTableWrapMedia = tbl => {
+    if (tbl.getAttribute('data-table-wrap') !== 'true') {
+        return null
+    }
+    const name = tbl.getAttribute('data-table-wrap-breakpoint') || 'md'
+    const width = dataTableBreakpoints[name] ?? dataTableBreakpoints.md
+    return window.matchMedia(`(max-width: ${width - 0.02}px)`)
+}
+
+// Builds the complete simple-datatables options for one table: the shared labels and classes, the
+// table's own `data-table-*` settings and the `tableRender` hook. This is the single source for
+// every initializer - the page-load pass below, and any script that constructs a table later on
+// (e.g. one swapped in by htmx) through `window.hinodeDatatables.options(tbl)` - so the two paths
+// cannot drift apart. Every call returns fresh objects, so a caller may extend the result freely.
+const dataTableOptions = tbl => {
     let perPageSelectAttr = tbl.getAttribute('data-table-paging-option-perPageSelect');
     let perPageSelect;
     if (perPageSelectAttr) {
@@ -252,6 +270,8 @@ document.querySelectorAll('.data-table').forEach(tbl => {
 
     const options = {
         ...tableOptions,
+        labels: { ...tableOptions.labels },
+        classes: { ...tableOptions.classes },
         sortable: (tbl.getAttribute('data-table-sortable') === 'true'),
         paging: (tbl.getAttribute('data-table-paging') === 'true'),
         searchable: (tbl.getAttribute('data-table-searchable') === 'true'),
@@ -259,17 +279,9 @@ document.querySelectorAll('.data-table').forEach(tbl => {
         perPageSelect: perPageSelect
     }
 
-    // A wrapped table renders its last column on a row of its own below the main breakpoint. At
-    // `xs` the max-width evaluates below zero, so the query never matches and wrapping is off -
-    // matching Hinode, which does not emit the attribute at `xs` either.
-    let media = null
-    let wrapCols = null
-    if (tbl.getAttribute('data-table-wrap') === 'true') {
-        const name = tbl.getAttribute('data-table-wrap-breakpoint') || 'md'
-        const width = dataTableBreakpoints[name] ?? dataTableBreakpoints.md
-        media = window.matchMedia(`(max-width: ${width - 0.02}px)`)
-        wrapCols = tbl.getAttribute('data-table-wrap-cols')
-    }
+    // A wrapped table renders its last column on a row of its own below the main breakpoint.
+    const media = dataTableWrapMedia(tbl)
+    const wrapCols = media ? tbl.getAttribute('data-table-wrap-cols') : null
 
     options.tableRender = (_data, table, type) => {
         const rendered = styleHeader(table)
@@ -284,10 +296,15 @@ document.querySelectorAll('.data-table').forEach(tbl => {
         return wrapColumnGroups(rendered, parseColumnGroups(wrapCols, headerCells))
     }
 
-    const dt = new window.simpleDatatables.DataTable(tbl, options)
+    return options
+}
 
+// Wires a constructed DataTable into the behaviour that lives outside its options: a redraw when a
+// wrapped table crosses its breakpoint, and the category filter button group.
+const dataTableAttach = (tbl, dt) => {
     // Redraw on the other side of the breakpoint. `update(true)` keeps the active sort, page and
     // search term; `refresh()` would clear the search.
+    const media = dataTableWrapMedia(tbl)
     if (media) {
         media.addEventListener('change', () => dt.update(true))
     }
@@ -299,6 +316,22 @@ document.querySelectorAll('.data-table').forEach(tbl => {
         if (!tableFilterInstances[filterId]) tableFilterInstances[filterId] = []
         tableFilterInstances[filterId].push({ dt, filterCol })
     }
+}
+
+// The public API, documented in the README. Published before the page-load pass so the pass runs
+// through the very same functions a later initializer calls.
+window.hinodeDatatables = Object.freeze({
+    options: dataTableOptions,
+    attach: dataTableAttach
+})
+
+// A table marked `data-table-init="manual"` belongs to a later initializer, which builds it through
+// the API above once it has added options of its own (such as `columns`). The pass leaves it alone:
+// once constructed, a table cannot be handed over, and an initializer that lost the race would have
+// to settle for options it never set.
+document.querySelectorAll('.data-table:not([data-table-init="manual"])').forEach(tbl => {
+    const dt = new window.simpleDatatables.DataTable(tbl, window.hinodeDatatables.options(tbl))
+    window.hinodeDatatables.attach(tbl, dt)
 })
 
 // Category filter button group.
@@ -344,4 +377,8 @@ document.querySelectorAll('[data-filter-table]').forEach(btn => {
     })
 })
 
-
+// Announce the API. This bundle loads `async`, so a script that needs the options may run before or
+// after it: one that finds `window.hinodeDatatables` unset listens for this event instead. It fires
+// after the page-load pass, so every table present at that point is already constructed (it carries
+// the `datatable-table` class) and a listener only has to handle tables the pass never saw or skipped.
+document.dispatchEvent(new CustomEvent('hinode:datatables-ready', { detail: window.hinodeDatatables }))

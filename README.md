@@ -50,6 +50,38 @@ Simple datatables is compatible with Bootstrap tables. It uses Hugo's `i18n` fol
 | data-table-paging-option-perPageSelect     | `[5, 10, 20, 50, ["{{ T "tablePerPageSelectAll" }}", -1]]`  | Paging option: Sets the per page options in the dropdown. i18 translation id for all: tablePerPageSelectAll |
 | data-table-searchable | `true`  | Toggle the ability to search the dataset. |
 
+### Initializing tables added later
+
+The module initializes every `.data-table` present when its script runs. A script that adds tables afterwards, for example tables swapped in by htmx, can build them with the same labels, classes and rendering through `window.hinodeDatatables`:
+
+| Member | Description |
+|--------|-------------|
+| `options(table)` | Returns the complete simple-datatables options for `table`, derived from its `data-table-*` attributes: the localized `labels` (the search label is visually hidden, the input's placeholder names it), the Bootstrap `classes`, `sortable`, `paging`, `searchable`, `perPage`, `perPageSelect`, and the `tableRender` hook that styles the header and wraps columns. Each call returns fresh objects, so you can add or override options such as `columns` before passing them on. |
+| `attach(table, dataTable)` | Wires a constructed `DataTable` into the behavior that lives outside its options: a redraw when a wrapped table crosses its breakpoint, and the category filter button group. |
+
+The module's own page-load pass uses the same two functions, so a table built through them is identical to one the module built itself.
+
+To keep the page-load pass away from a table that your script builds itself, for example because it adds `columns` or event handlers of its own, mark the table with `data-table-init="manual"`. The pass skips any `.data-table` with that attribute and leaves it for your script to build through `options` and `attach`. Without the attribute, a table already in the page when the module script runs is built by the pass, even if your script meant to build it. Once built, a table cannot be rebuilt with different options.
+
+The module script loads `async`, so it may run before or after your script. When `window.hinodeDatatables` is not set yet, wait for the `hinode:datatables-ready` event on `document`. Its `detail` holds the same API. The event fires after the page-load pass, so by then every table on the page that is not marked `manual` carries the `datatable-table` class:
+
+```js
+function withDatatables (callback) {
+  if (window.hinodeDatatables) {
+    callback(window.hinodeDatatables)
+  } else {
+    document.addEventListener('hinode:datatables-ready', event => callback(event.detail), { once: true })
+  }
+}
+
+withDatatables(api => {
+  document.querySelectorAll('.data-table:not(.datatable-table)').forEach(table => {
+    const dataTable = new window.simpleDatatables.DataTable(table, api.options(table))
+    api.attach(table, dataTable)
+  })
+})
+```
+
 <!-- MARKDOWN LINKS -->
 [hugo]: https://gohugo.io
 [hugo_multilingual]: https://gohugo.io/content-management/multilingual/
