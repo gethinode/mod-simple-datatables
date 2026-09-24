@@ -1,0 +1,13 @@
+// Import the simple-datatables stylesheet, mounted from `dist` by config.toml
+@import "modules/simple-datatables/simple-datatables";
+
+// Keeps the per-page select on one line with its "entries per page" text. The select carries
+// Bootstrap's `form-select`, which is a full-width block, so on its own it pushes the text inside the
+// same `<label>` onto a line below. The rule lives here rather than as utility classes on the
+// select: those only ever appear in this module's JavaScript, so a site's PurgeCSS pass - which
+// reads the classes from `hugo_stats.json` - would drop them, whereas Hinode's purge safelist keeps
+// every selector that mentions `datatable`.
+.datatable-dropdown .form-select {
+    display: inline-block;
+    width: auto;
+}
