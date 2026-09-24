@@ -56,22 +56,32 @@ The module initializes every `.data-table` present when its script runs. A scrip
 
 | Member | Description |
 |--------|-------------|
-| `options(table)` | Returns the complete simple-datatables options for `table`, derived from its `data-table-*` attributes: the localized `labels` (the search label is visually hidden, the input's placeholder names it), the Bootstrap `classes`, `sortable`, `paging`, `searchable`, `perPage`, `perPageSelect`, and the `tableRender` hook that styles the header and wraps columns. Each call returns fresh objects, so you can add or override options such as `columns` before passing them on. |
-| `attach(table, dataTable)` | Wires a constructed `DataTable` into the behavior that lives outside its options: a redraw when a wrapped table crosses its breakpoint, and the category filter button group. |
+| `options(table)` | Returns the complete simple-datatables options for `table`, derived from its `data-table-*` attributes: the site's `locale`, the localized `labels` (the search label is visually hidden, the input's placeholder names it), the Bootstrap `classes`, `sortable`, `paging`, `searchable`, `perPage`, `perPageSelect`, and the `tableRender` hook that styles the header and wraps columns. Each call returns fresh objects, so you can add or override options such as `columns` before passing them on. |
+| `attach(table, dataTable)` | Wires a constructed `DataTable` into the behavior that lives outside its options: a redraw when a wrapped table crosses its breakpoint, and the category filter button group. It is idempotent: calling it again with the same `DataTable` changes nothing. The module binds the filter buttons once, when its script runs. A table is therefore filtered only by a button group (`data-filter-table`) that was on the page at that point. A group swapped in later is not wired. |
 
 The module's own page-load pass uses the same two functions, so a table built through them is identical to one the module built itself.
 
 To keep the page-load pass away from a table that your script builds itself, for example because it adds `columns` or event handlers of its own, mark the table with `data-table-init="manual"`. The pass skips any `.data-table` with that attribute and leaves it for your script to build through `options` and `attach`. Without the attribute, a table already in the page when the module script runs is built by the pass, even if your script meant to build it. Once built, a table cannot be rebuilt with different options.
 
-The module script loads `async`, so it may run before or after your script. When `window.hinodeDatatables` is not set yet, wait for the `hinode:datatables-ready` event on `document`. Its `detail` holds the same API. The event fires after the page-load pass, so by then every table on the page that is not marked `manual` carries the `datatable-table` class:
+The module script loads `async`, so it may run before or after your script. When `window.hinodeDatatables` is not set yet, wait for the `hinode:datatables-ready` event on `document`. Its `detail` holds the same API. The event fires after the page-load pass, so by then every table the pass built carries the `datatable-table` class. The pass builds each table on its own: a table it cannot build, for example because of a malformed attribute, is logged to the console and left as it is, and the event still fires.
+
+The event fires only on a page that loads the module's script, which Hinode adds to pages that use the module. If your script also runs on other pages, or the script fails to load, the event never arrives. Keep your wait bounded, as in this example, and decide what a table should look like when the module is absent:
 
 ```js
-function withDatatables (callback) {
+function withDatatables (callback, timeout = 10000) {
   if (window.hinodeDatatables) {
     callback(window.hinodeDatatables)
-  } else {
-    document.addEventListener('hinode:datatables-ready', event => callback(event.detail), { once: true })
+    return
   }
+  const onReady = event => {
+    clearTimeout(timer)
+    callback(event.detail)
+  }
+  const timer = setTimeout(() => {
+    document.removeEventListener('hinode:datatables-ready', onReady)
+    console.warn('simple-datatables did not load; tables stay unenhanced')
+  }, timeout)
+  document.addEventListener('hinode:datatables-ready', onReady, { once: true })
 }
 
 withDatatables(api => {
