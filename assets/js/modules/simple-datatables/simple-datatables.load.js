@@ -245,9 +245,15 @@ const dataTableOptions = tbl => {
             perPageSelect = JSON.parse(perPageSelectAttr);
         } catch (e) {
             console.error('Error parsing perPageSelect, use default value:', e);
-            perPageSelect = [5, 10, 20, 50, ["{{ T "tablePerPageSelectAll" }}", -1]];
         }
-    } else {
+        // Valid JSON is not necessarily a list: `"5"` parses to a number, and the normalization
+        // below would then throw on it.
+        if (perPageSelect !== undefined && !Array.isArray(perPageSelect)) {
+            console.error('perPageSelect is not an array, use default value:', perPageSelectAttr);
+            perPageSelect = undefined;
+        }
+    }
+    if (perPageSelect === undefined) {
         perPageSelect = [5, 10, 20, 50, ["{{ T "tablePerPageSelectAll" }}", -1]];
     }
 
@@ -299,9 +305,20 @@ const dataTableOptions = tbl => {
     return options
 }
 
+// Instances already wired by `dataTableAttach`, so that calling it again for the same instance does
+// not register a second breakpoint listener or a second category filter entry.
+const dataTableAttached = new WeakSet()
+
 // Wires a constructed DataTable into the behaviour that lives outside its options: a redraw when a
-// wrapped table crosses its breakpoint, and the category filter button group.
+// wrapped table crosses its breakpoint, and the category filter button group. Idempotent per
+// instance. The filter buttons are bound once, when the module runs, so a table is only filtered
+// by a button group that was on the page at that point.
 const dataTableAttach = (tbl, dt) => {
+    if (dataTableAttached.has(dt)) {
+        return
+    }
+    dataTableAttached.add(dt)
+
     // Redraw on the other side of the breakpoint. `update(true)` keeps the active sort, page and
     // search term; `refresh()` would clear the search.
     const media = dataTableWrapMedia(tbl)
@@ -325,60 +342,71 @@ window.hinodeDatatables = Object.freeze({
     attach: dataTableAttach
 })
 
-// A table marked `data-table-init="manual"` belongs to a later initializer, which builds it through
-// the API above once it has added options of its own (such as `columns`). The pass leaves it alone:
-// once constructed, a table cannot be handed over, and an initializer that lost the race would have
-// to settle for options it never set.
-document.querySelectorAll('.data-table:not([data-table-init="manual"])').forEach(tbl => {
-    const dt = new window.simpleDatatables.DataTable(tbl, window.hinodeDatatables.options(tbl))
-    window.hinodeDatatables.attach(tbl, dt)
-})
-
-// Category filter button group.
-// Uses simple-datatables search(term, columns, source) when a DataTable instance
-// is available, so sorting, pagination and free-text search all continue to work
-// alongside category filtering. Falls back to direct DOM row toggling when no
-// DataTable is active on the table (e.g. filter-only without sortable/paginate/searchable).
-document.querySelectorAll('[data-filter-table]').forEach(btn => {
-    btn.addEventListener('click', function () {
-        const tableId = this.getAttribute('data-filter-table')
-        const filterValue = this.getAttribute('data-filter-value').toLowerCase()
-
-        // Update active button state
-        document.querySelectorAll(`[data-filter-table="${tableId}"]`).forEach(b => {
-            b.classList.toggle('active', b === this)
-        })
-
-        const instances = tableFilterInstances[tableId]
-        if (instances) {
-            // DataTable path — filter persists across sorts and pagination updates.
-            // The named source 'category-filter' is independent of the built-in
-            // search input so both narrow the result set simultaneously.
-            instances.forEach(({ dt, filterCol }) => {
-                dt.search(filterValue, [filterCol], 'category-filter')
-            })
-        } else {
-            // Fallback: direct DOM manipulation (no simple-datatables on this table)
-            document.querySelectorAll(`[data-filter-container="${tableId}"]`).forEach(container => {
-                const table = container.querySelector('table')
-                if (!table) return
-                const col = parseInt(table.getAttribute('data-filter-col') ?? '1')
-                table.querySelectorAll('tbody tr').forEach(row => {
-                    if (!filterValue) {
-                        row.style.display = ''
-                        return
-                    }
-                    const cell = row.cells[col]
-                    const text = cell ? cell.textContent.trim().toLowerCase() : ''
-                    row.style.display = text.includes(filterValue) ? '' : 'none'
-                })
-            })
+// The page-load pass and the filter wiring run inside `try` so that the ready event below is sent
+// whatever happens in them: a late initializer waiting on it must never be stranded.
+try {
+    // A table marked `data-table-init="manual"` belongs to a later initializer, which builds it through
+    // the API above once it has added options of its own (such as `columns`). The pass leaves it alone:
+    // once constructed, a table cannot be handed over, and an initializer that lost the race would have
+    // to settle for options it never set.
+    //
+    // Each table is built in isolation: one that fails - a malformed attribute, say - is logged and
+    // skipped, rather than aborting the pass and leaving every later table unbuilt.
+    document.querySelectorAll('.data-table:not([data-table-init="manual"])').forEach(tbl => {
+        try {
+            const dt = new window.simpleDatatables.DataTable(tbl, window.hinodeDatatables.options(tbl))
+            window.hinodeDatatables.attach(tbl, dt)
+        } catch (e) {
+            console.error(`Error initializing data table${tbl.id ? ` #${tbl.id}` : ''}:`, tbl, e)
         }
     })
-})
 
-// Announce the API. This bundle loads `async`, so a script that needs the options may run before or
-// after it: one that finds `window.hinodeDatatables` unset listens for this event instead. It fires
-// after the page-load pass, so every table present at that point is already constructed (it carries
-// the `datatable-table` class) and a listener only has to handle tables the pass never saw or skipped.
-document.dispatchEvent(new CustomEvent('hinode:datatables-ready', { detail: window.hinodeDatatables }))
+    // Category filter button group.
+    // Uses simple-datatables search(term, columns, source) when a DataTable instance
+    // is available, so sorting, pagination and free-text search all continue to work
+    // alongside category filtering. Falls back to direct DOM row toggling when no
+    // DataTable is active on the table (e.g. filter-only without sortable/paginate/searchable).
+    document.querySelectorAll('[data-filter-table]').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const tableId = this.getAttribute('data-filter-table')
+            const filterValue = this.getAttribute('data-filter-value').toLowerCase()
+
+            // Update active button state
+            document.querySelectorAll(`[data-filter-table="${tableId}"]`).forEach(b => {
+                b.classList.toggle('active', b === this)
+            })
+
+            const instances = tableFilterInstances[tableId]
+            if (instances) {
+                // DataTable path — filter persists across sorts and pagination updates.
+                // The named source 'category-filter' is independent of the built-in
+                // search input so both narrow the result set simultaneously.
+                instances.forEach(({ dt, filterCol }) => {
+                    dt.search(filterValue, [filterCol], 'category-filter')
+                })
+            } else {
+                // Fallback: direct DOM manipulation (no simple-datatables on this table)
+                document.querySelectorAll(`[data-filter-container="${tableId}"]`).forEach(container => {
+                    const table = container.querySelector('table')
+                    if (!table) return
+                    const col = parseInt(table.getAttribute('data-filter-col') ?? '1')
+                    table.querySelectorAll('tbody tr').forEach(row => {
+                        if (!filterValue) {
+                            row.style.display = ''
+                            return
+                        }
+                        const cell = row.cells[col]
+                        const text = cell ? cell.textContent.trim().toLowerCase() : ''
+                        row.style.display = text.includes(filterValue) ? '' : 'none'
+                    })
+                })
+            }
+        })
+    })
+} finally {
+    // Announce the API. This bundle loads `async`, so a script that needs the options may run before
+    // or after it: one that finds `window.hinodeDatatables` unset listens for this event instead. It
+    // fires after the page-load pass, so every table the pass built already carries the
+    // `datatable-table` class, and a listener only has to handle tables the pass never saw or skipped.
+    document.dispatchEvent(new CustomEvent('hinode:datatables-ready', { detail: window.hinodeDatatables }))
+}
