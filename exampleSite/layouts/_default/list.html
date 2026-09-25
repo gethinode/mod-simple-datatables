@@ -30,5 +30,35 @@
           {{ end }}
       </tbody>
     </table>
+
+    <!--
+      A header that is not sortable holds its heading as plain text, where a sortable one holds the
+      library's sorter button. Every row below must render exactly as written, and keep doing so
+      after sorting on Started. Check it on the unminified dev server (`pnpm start`): the defect
+      needs the whitespace between the tags, which `--minify` strips.
+    -->
+    <h2>Recent runs</h2>
+    <table id="demo-table2" class="data-table" data-table-sortable="true">
+      <thead>
+        <tr>
+          <th>Started</th>
+          <th data-sort="false">Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-order="1780279200">7 hours ago</td>
+          <td>Nightly load</td>
+        </tr>
+        <tr>
+          <td data-order="1780236000">19 hours ago</td>
+          <td>Backfill</td>
+        </tr>
+        <tr>
+          <td data-order="1780070400">3 days ago</td>
+          <td>Schema sync</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 {{ end }}
