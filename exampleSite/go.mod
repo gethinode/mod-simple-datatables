@@ -5,6 +5,6 @@ go 1.19
 require (
 	github.com/gethinode/mod-bootstrap v1.5.0 // indirect
 	github.com/gethinode/mod-simple-datatables/v4 v4.3.1 // indirect
-	github.com/gethinode/mod-utils/v6 v6.15.0 // indirect
+	github.com/gethinode/mod-utils/v6 v6.16.0 // indirect
 	github.com/twbs/bootstrap v5.3.8+incompatible // indirect
 )
