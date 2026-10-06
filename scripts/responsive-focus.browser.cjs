@@ -31,7 +31,7 @@ writeFileSync(fixture, `<!doctype html><html><head>
     .host { width: 600px; max-width: 100%; }
     body { padding: 16px; }
     .datatable-top { padding-inline: 0; }
-    #always { min-width: 900px; }
+    #always, #nested-auto { min-width: 900px; }
     .form-select, .form-control { transition: none !important; }
   </style></head><body>
   <div class="host table-responsive keep-class" id="always-host">${table('always')}</div>
@@ -39,6 +39,16 @@ writeFileSync(fixture, `<!doctype html><html><head>
     `<div class="host table-responsive-${breakpoint}" id="breakpoint-${breakpoint}">${table(`table-${breakpoint}`)}</div>`
   ).join('')}
   <div class="host table-responsive keep-class" id="manual-host">${table('manual', true)}</div>
+  <div class="host table-responsive keep-outer" id="nested-auto-host">
+    <div class="keep-middle"><div class="table-responsive-md keep-inner">${table('nested-auto')}</div></div>
+  </div>
+  <div class="host table-responsive keep-outer" id="nested-manual-host">
+    <div class="table-responsive keep-middle"><div class="table-responsive-md keep-inner">${table('nested-manual', true)}</div></div>
+  </div>
+  <div class="host table-responsive" id="nested-shared-host">
+    <div class="table-responsive-md keep-inner">${table('nested-shared')}</div>
+    <table><tr><td>Static sibling</td></tr></table>
+  </div>
   <div class="host" id="bare-host">${table('bare')}</div>
   <div class="host table-responsive" id="shared-host">${table('shared')}<table><tr><td>Static sibling</td></tr></table></div>
   <div class="host table-responsive" id="static-host"><table><tr><td>Static table</td></tr></table></div>
@@ -111,8 +121,32 @@ writeFileSync(fixture, `<!doctype html><html><head>
       const next = new window.simpleDatatables.DataTable(restored, api.options(restored));
       api.attach(restored, next);
       result.reinitialize = { outer: responsive(manualHost), inner: responsive(next.containerDOM) };
+      const nestedAuto = document.querySelector('#nested-auto-host');
+      result.nestedAuto = {
+        controls: [nestedAuto.querySelector('select'), nestedAuto.querySelector('input'), nestedAuto.querySelector('.page-link[data-page="2"]')].map(clipped),
+        outer: responsive(nestedAuto),
+        inner: responsive(nestedAuto.querySelector('.keep-inner')),
+        container: responsive(nestedAuto.querySelector('.datatable-container')),
+        scrolls: nestedAuto.querySelector('.datatable-container').scrollWidth > nestedAuto.querySelector('.datatable-container').clientWidth,
+        customClasses: ['keep-outer', 'keep-middle', 'keep-inner'].every(name => nestedAuto.classList.contains(name) || nestedAuto.querySelector('.' + name))
+      };
+      const nestedHost = document.querySelector('#nested-manual-host');
+      const nestedTable = nestedHost.querySelector('table');
+      const nested = new window.simpleDatatables.DataTable(nestedTable, api.options(nestedTable));
+      api.attach(nestedTable, nested);
+      api.attach(nestedTable, nested);
+      result.nestedManual = { outer: responsive(nestedHost), middle: responsive(nestedHost.querySelector('.keep-middle')), inner: responsive(nestedHost.querySelector('.keep-inner')), focus: clipped(nested.wrapperDOM.querySelector('input')) };
+      nested.destroy();
+      result.nestedDestroy = { outer: responsive(nestedHost), middle: responsive(nestedHost.querySelector('.keep-middle')), inner: responsive(nestedHost.querySelector('.keep-inner')) };
+      nested.init();
+      api.attach(nested.dom, nested);
+      result.nestedReinitialize = { outer: responsive(nestedHost), middle: responsive(nestedHost.querySelector('.keep-middle')), inner: responsive(nestedHost.querySelector('.keep-inner')), focus: clipped(nested.wrapperDOM.querySelector('input')) };
+      nested.destroy();
+      result.nestedDestroyAgain = { outer: responsive(nestedHost), middle: responsive(nestedHost.querySelector('.keep-middle')), inner: responsive(nestedHost.querySelector('.keep-inner')) };
       result.bare = responsive(document.querySelector('#bare-host .datatable-container'));
       result.shared = responsive(document.querySelector('#shared-host'));
+      const nestedShared = document.querySelector('#nested-shared-host');
+      result.nestedShared = { outer: responsive(nestedShared), inner: responsive(nestedShared.querySelector('.keep-inner')), container: responsive(nestedShared.querySelector('.datatable-container')) };
       result.static = responsive(document.querySelector('#static-host'));
       result.unknown = document.querySelector('#unknown-host').className;
     } catch (error) { result.error = error.stack; }
@@ -133,7 +167,7 @@ for (const width of [1400, 400]) for (const theme of ['light', 'dark']) {
     assert.ok(encoded, 'browser fixture must report its results')
     const result = JSON.parse(encoded.replaceAll('&quot;', '"').replaceAll('&amp;', '&'))
     assert.equal(result.error, undefined)
-    for (const control of [result.auto.select, result.auto.search, result.auto.pagination, result.manual.focus]) {
+    for (const control of [result.auto.select, result.auto.search, result.auto.pagination, result.manual.focus, ...result.nestedAuto.controls, result.nestedManual.focus, result.nestedReinitialize.focus]) {
       assert.equal(control.focused, true, 'the inspected control must receive focus')
       assert.notEqual(control.shadow, 'none', 'focus feedback must remain enabled')
       assert.deepEqual(control.edges, [], 'focus shadow must not be clipped by an ancestor')
@@ -160,8 +194,22 @@ for (const width of [1400, 400]) for (const theme of ['light', 'dark']) {
     assert.deepEqual(result.sameInstance.inner, ['table-responsive'])
     assert.deepEqual(result.sameInstance.focus.edges, [])
     assert.deepEqual(result.reinitialize, { outer: [], inner: ['table-responsive'] })
+    assert.deepEqual(result.nestedAuto.outer, [])
+    assert.deepEqual(result.nestedAuto.inner, [])
+    assert.deepEqual(result.nestedAuto.container, ['table-responsive-md', 'table-responsive'])
+    assert.equal(result.nestedAuto.scrolls, true)
+    assert.equal(result.nestedAuto.customClasses, true)
+    assert.deepEqual(result.nestedManual.outer, [])
+    assert.deepEqual(result.nestedManual.middle, [])
+    assert.deepEqual(result.nestedManual.inner, [])
+    assert.deepEqual(result.nestedDestroy, { outer: ['table-responsive'], middle: ['table-responsive'], inner: ['table-responsive-md'] })
+    assert.deepEqual(result.nestedReinitialize.outer, [])
+    assert.deepEqual(result.nestedReinitialize.middle, [])
+    assert.deepEqual(result.nestedReinitialize.inner, [])
+    assert.deepEqual(result.nestedDestroyAgain, result.nestedDestroy)
     assert.deepEqual(result.bare, [])
     assert.deepEqual(result.shared, ['table-responsive'])
+    assert.deepEqual(result.nestedShared, { outer: ['table-responsive'], inner: [], container: ['table-responsive-md'] })
     assert.deepEqual(result.static, ['table-responsive'])
     assert.equal(result.unknown, 'host table-responsive-custom')
   })

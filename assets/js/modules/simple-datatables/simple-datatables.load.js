@@ -336,27 +336,35 @@ const dataTableAttach = (tbl, dt) => {
     // scrolling clips their focus rings at the outside edges, so scroll only the table container.
     // Keep breakpoint classes and any unrelated wrapper classes. A wrapper shared with other
     // elements stays intact, since moving its classes would remove their responsive scrolling.
-    const wrapper = dt.wrapperDOM?.parentElement
-    if (wrapper?.children.length === 1 && dt.containerDOM) {
+    const responsiveWrappers = []
+    let wrapper = dt.wrapperDOM?.parentElement
+    // Markdown render hooks and table components can each add a responsive wrapper. Walk the
+    // dedicated ancestor chain, including plain wrappers between those scrolling containers.
+    while (wrapper?.children.length === 1 && dt.containerDOM) {
         const responsiveClasses = Array.from(wrapper.classList).filter(name =>
             /^table-responsive(?:-(?:sm|md|lg|xl|xxl))?$/.test(name)
         )
         if (responsiveClasses.length) {
             wrapper.classList.remove(...responsiveClasses)
             dt.containerDOM.classList.add(...responsiveClasses)
-            dataTableResponsive.set(dt, { wrapper, responsiveClasses })
+            responsiveWrappers.push({ wrapper, responsiveClasses })
         }
+        wrapper = wrapper.parentElement
+    }
+    if (responsiveWrappers.length) {
+        const previous = dataTableResponsive.get(dt) || []
+        dataTableResponsive.set(dt, previous.concat(responsiveWrappers))
     }
 
     if (dataTableAttached.has(dt)) {
         return
     }
     dataTableAttached.add(dt)
-    // Register once per instance, but restore the wrapper of its current initialization.
+    // Register once per instance, but restore the wrappers of its current initialization.
     dt.on('datatable.destroy', () => {
-        const responsive = dataTableResponsive.get(dt)
-        if (responsive) {
-            responsive.wrapper.classList.add(...responsive.responsiveClasses)
+        const wrappers = dataTableResponsive.get(dt)
+        if (wrappers) {
+            wrappers.forEach(({ wrapper, responsiveClasses }) => wrapper.classList.add(...responsiveClasses))
             dataTableResponsive.delete(dt)
         }
     })
