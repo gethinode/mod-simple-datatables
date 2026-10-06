@@ -324,16 +324,42 @@ const dataTableOptions = tbl => {
 // Instances already wired by `dataTableAttach`, so that calling it again for the same instance does
 // not register a second breakpoint listener or a second category filter entry.
 const dataTableAttached = new WeakSet()
+// Responsive wrappers belong to an initialization, since destroy()/init() can reuse an instance.
+const dataTableResponsive = new WeakMap()
 
 // Wires a constructed DataTable into the behaviour that lives outside its options: a redraw when a
-// wrapped table crosses its breakpoint, and the category filter button group. Idempotent per
-// instance. The filter buttons are bound once, when the module runs, so a table is only filtered
-// by a button group that was on the page at that point.
+// wrapped table crosses its breakpoint, responsive scrolling, and the category filter button group.
+// The filter buttons are bound once, when the module runs, so a table is only filtered by a button
+// group that was on the page at that point.
 const dataTableAttach = (tbl, dt) => {
+    // The library inserts its controls inside the table's original responsive wrapper. Its
+    // scrolling clips their focus rings at the outside edges, so scroll only the table container.
+    // Keep breakpoint classes and any unrelated wrapper classes. A wrapper shared with other
+    // elements stays intact, since moving its classes would remove their responsive scrolling.
+    const wrapper = dt.wrapperDOM?.parentElement
+    if (wrapper?.children.length === 1 && dt.containerDOM) {
+        const responsiveClasses = Array.from(wrapper.classList).filter(name =>
+            /^table-responsive(?:-(?:sm|md|lg|xl|xxl))?$/.test(name)
+        )
+        if (responsiveClasses.length) {
+            wrapper.classList.remove(...responsiveClasses)
+            dt.containerDOM.classList.add(...responsiveClasses)
+            dataTableResponsive.set(dt, { wrapper, responsiveClasses })
+        }
+    }
+
     if (dataTableAttached.has(dt)) {
         return
     }
     dataTableAttached.add(dt)
+    // Register once per instance, but restore the wrapper of its current initialization.
+    dt.on('datatable.destroy', () => {
+        const responsive = dataTableResponsive.get(dt)
+        if (responsive) {
+            responsive.wrapper.classList.add(...responsive.responsiveClasses)
+            dataTableResponsive.delete(dt)
+        }
+    })
 
     // Redraw on the other side of the breakpoint. `update(true)` keeps the active sort, page and
     // search term; `refresh()` would clear the search.

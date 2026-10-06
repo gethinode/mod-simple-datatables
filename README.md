@@ -50,6 +50,17 @@ Simple datatables is compatible with Bootstrap tables. It uses Hugo's `i18n` fol
 | data-table-paging-option-perPageSelect     | `[5, 10, 20, 50, ["{{ T "tablePerPageSelectAll" }}", -1]]`  | Paging option: Sets the per page options in the dropdown. i18 translation id for all: tablePerPageSelectAll |
 | data-table-searchable | `true`  | Toggle the ability to search the dataset. |
 
+### Responsive tables
+
+Place a table in its own Bootstrap `.table-responsive` or `.table-responsive-{sm|md|lg|xl|xxl}`
+wrapper. When the table is initialized, the module moves that class onto the generated table
+container. The selector, search input, and pagination stay outside the scrolling area, so their
+focus rings remain visible. Breakpoint settings and unrelated wrapper classes are preserved, and
+destroying the DataTable restores the responsive class to the original wrapper.
+
+Wrappers containing other elements keep their responsive classes, so those elements retain their
+scrolling behavior. Tables without a responsive wrapper are unchanged.
+
 ### Initializing tables added later
 
 The module initializes every `.data-table` present when its script runs. A script that adds tables afterwards, for example tables swapped in by htmx, can build them with the same labels, classes and rendering through `window.hinodeDatatables`:
@@ -57,7 +68,7 @@ The module initializes every `.data-table` present when its script runs. A scrip
 | Member | Description |
 |--------|-------------|
 | `options(table)` | Returns the complete simple-datatables options for `table`, derived from its `data-table-*` attributes: the site's `locale`, the localized `labels` (the search label is visually hidden, the input's placeholder names it), the Bootstrap `classes`, `sortable`, `paging`, `searchable`, `perPage`, `perPageSelect`, and the `tableRender` hook that styles the header and wraps columns. Each call returns fresh objects, so you can add or override options such as `columns` before passing them on. |
-| `attach(table, dataTable)` | Wires a constructed `DataTable` into the behavior that lives outside its options: a redraw when a wrapped table crosses its breakpoint, and the category filter button group. It is idempotent: calling it again with the same `DataTable` changes nothing. The module binds the filter buttons once, when its script runs. A table is therefore filtered only by a button group (`data-filter-table`) that was on the page at that point. A group swapped in later is not wired. |
+| `attach(table, dataTable)` | Wires a constructed `DataTable` into the behavior that lives outside its options: a redraw when a wrapped table crosses its breakpoint, responsive scrolling, and the category filter button group. It is idempotent: calling it again with the same `DataTable` changes nothing. The module binds the filter buttons once, when its script runs. A table is therefore filtered only by a button group (`data-filter-table`) that was on the page at that point. A group swapped in later is not wired. |
 
 The module's own page-load pass uses the same two functions, so a table built through them is identical to one the module built itself.
 
@@ -91,6 +102,12 @@ withDatatables(api => {
   })
 })
 ```
+
+### Browser regression checks
+
+Run `pnpm test:browser` to build the example site and check responsive focus rings, scrolling,
+breakpoints, and the attach/destroy lifecycle in headless Chrome or Chromium. Set `CHROME_BIN` to
+the browser executable if it is not installed in a standard location.
 
 <!-- MARKDOWN LINKS -->
 [hugo]: https://gohugo.io
