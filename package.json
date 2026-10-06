@@ -27,6 +27,7 @@
     "postinstall": "cpy node_modules/simple-datatables/dist/style.css dist --rename=simple-datatables.scss --flat && cpy node_modules/simple-datatables/dist/umd/simple-datatables.js dist --rename=simple-datatables.js --flat && pnpm update:js",
     "update:js": "replace-in-files --string=\"f.style=c(f.style,t)\" --replacement=\"\" dist/simple-datatables.js",
     "test": "pnpm build",
+    "test:browser": "pnpm build && node --test scripts/*.browser.cjs",
     "upgrade": "pnpm dlx npm-check-updates -u && pnpm mod:update",
     "prepare": "node .husky/install.mjs"
   },
