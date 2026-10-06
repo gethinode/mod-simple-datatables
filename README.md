@@ -53,10 +53,11 @@ Simple datatables is compatible with Bootstrap tables. It uses Hugo's `i18n` fol
 ### Responsive tables
 
 Place a table in its own Bootstrap `.table-responsive` or `.table-responsive-{sm|md|lg|xl|xxl}`
-wrapper. When the table is initialized, the module moves that class onto the generated table
-container. The selector, search input, and pagination stay outside the scrolling area, so their
-focus rings remain visible. Breakpoint settings and unrelated wrapper classes are preserved, and
-destroying the DataTable restores the responsive class to the original wrapper.
+wrapper. When the table is initialized, the module moves responsive classes from its dedicated
+ancestor wrappers onto the generated table container. This also handles nested responsive wrappers,
+including plain wrappers between them. The selector, search input, and pagination stay outside the
+scrolling area, so their focus rings remain visible. Breakpoint settings and unrelated wrapper classes are preserved, and
+destroying the DataTable restores each responsive class to its original wrapper.
 
 Wrappers containing other elements keep their responsive classes, so those elements retain their
 scrolling behavior. Tables without a responsive wrapper are unchanged.
