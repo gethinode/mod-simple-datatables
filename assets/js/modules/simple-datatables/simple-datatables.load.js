@@ -376,6 +376,49 @@ const dataTableAttached = new WeakSet()
 // Responsive wrappers belong to an initialization, since destroy()/init() can reuse an instance.
 const dataTableResponsive = new WeakMap()
 
+// Footer measurements belong to an initialization, since destroy()/init() creates new controls.
+const dataTableFooters = new WeakMap()
+const dataTableObserveFooter = dt => {
+    const footer = dt.wrapperDOM.querySelector('.datatable-bottom')
+    const previous = dataTableFooters.get(dt)
+    if (previous?.footer === footer) return
+    previous?.disconnect()
+    dataTableFooters.delete(dt)
+    if (!footer) return
+
+    const dropdown = footer.querySelector('.datatable-dropdown')
+    const info = footer.querySelector('.datatable-info')
+    const pager = footer.querySelector('.datatable-pagination')
+    if (!info || !pager) return
+
+    const update = () => {
+        if (!footer.isConnected || !footer.clientWidth) return
+        const style = getComputedStyle(footer)
+        const gap = parseFloat(style.columnGap) || 0
+        const available = footer.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0)
+        const text = document.createRange()
+        text.selectNodeContents(info)
+        const side = Math.max(dropdown?.getBoundingClientRect().width || 0, pager.getBoundingClientRect().width)
+        // Equal side columns keep the count centered in the entire footer. Measure
+        // intrinsic controls in both layouts, so switching cannot change the threshold.
+        footer.classList.toggle('datatable-footer-stacked', 2 * side + text.getBoundingClientRect().width + 2 * gap > available + 0.5)
+    }
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update)
+    for (const element of [footer, dropdown, info, pager]) {
+        if (element) observer?.observe(element)
+    }
+    window.addEventListener('resize', update)
+    dataTableFooters.set(dt, {
+        footer,
+        update,
+        disconnect: () => {
+            observer?.disconnect()
+            window.removeEventListener('resize', update)
+        }
+    })
+    update()
+}
+
 // Wires a constructed DataTable into the behaviour that lives outside its options: a redraw when a
 // wrapped table crosses its breakpoint, responsive scrolling, and the category filter button group.
 // The filter buttons are bound once, when the module runs, so a table is only filtered by a button
@@ -405,6 +448,8 @@ const dataTableAttach = (tbl, dt) => {
         dataTableResponsive.set(dt, previous.concat(responsiveWrappers))
     }
 
+    if (tbl.getAttribute('data-table-controls-layout') === 'list') dataTableObserveFooter(dt)
+
     if (dataTableAttached.has(dt)) {
         return
     }
@@ -418,6 +463,7 @@ const dataTableAttach = (tbl, dt) => {
             if (!info) return
             const text = info.textContent.replace(/\b(\d+)–\1\b/g, '$1')
             if (text !== info.textContent) info.textContent = text
+            dataTableFooters.get(dt)?.update()
         }
         for (const event of ['init', 'page', 'perpage', 'search', 'multisearch', 'update', 'refresh']) {
             dt.on(`datatable.${event}`, compactInfo)
@@ -427,6 +473,8 @@ const dataTableAttach = (tbl, dt) => {
 
     // Register once per instance, but restore the wrappers of its current initialization.
     dt.on('datatable.destroy', () => {
+        dataTableFooters.get(dt)?.disconnect()
+        dataTableFooters.delete(dt)
         const wrappers = dataTableResponsive.get(dt)
         if (wrappers) {
             wrappers.forEach(({ wrapper, responsiveClasses }) => wrapper.classList.add(...responsiveClasses))
