@@ -1,8 +1,8 @@
 const assert = require('node:assert/strict')
-const { existsSync, mkdtempSync, rmSync, writeFileSync } = require('node:fs')
+const { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } = require('node:fs')
 const { tmpdir } = require('node:os')
 const { join, resolve } = require('node:path')
-const { pathToFileURL } = require('node:url')
+const { createServer } = require('node:http')
 const { spawn } = require('node:child_process')
 const { once } = require('node:events')
 const test = require('node:test')
@@ -17,6 +17,7 @@ assert.ok(chrome, 'Chrome is required; set CHROME_BIN if needed')
 const output = resolve('exampleSite/public')
 const fixtureDir = mkdtempSync(join(tmpdir(), 'datatable-controls-'))
 const fixture = join(fixtureDir, 'index.html')
+let fixtureURL
 
 // Exercise native controls, not just the options builder. Breaking label escaping, moving
 // page size back above the list, or leaving the search at intrinsic width must fail here.
@@ -68,14 +69,28 @@ const probe = () => {
     select.dispatchEvent(new Event('change', { bubbles: true }))
     nav.querySelector('[data-page="16"]').click()
     result.lastInfo = info.textContent.trim()
-    input.value = '75' 
+    input.value = '75'
     input.dispatchEvent(new Event('input', { bubbles: true }))
     result.search = Array.from(tbl.tBodies[0].rows).map(row => row.textContent)
     result.searchInfo = info.textContent.trim()
+    const options = window.hinodeDatatables.options(tbl)
+    const template = options.template({ ...options, scrollY: '10rem' }, tbl)
+    result.templateHasInlineStyle = !!new DOMParser().parseFromString(template, 'text/html').querySelector('[style]')
+    document.querySelector('[data-filter-value="news"]').click()
+    const fallbackRows = Array.from(document.querySelectorAll('#fallback tbody tr'))
+    result.fallbackFiltered = fallbackRows.filter(row => bounds(row).height > 0).map(row => row.textContent)
+    document.querySelector('[data-filter-value=""]').click()
+    result.fallbackRestored = fallbackRows.every(row => bounds(row).height > 0)
   } catch (error) {
     result.error = error.stack
   }
-  document.querySelector('#result').textContent = JSON.stringify(result)
+  // CSP violations are dispatched asynchronously after the mutations that caused them.
+  setTimeout(() => {
+    result.inlineStyles = Array.from(document.querySelectorAll('.datatable-wrapper [style], #fallback [style]'))
+      .map(element => element.getAttribute('style'))
+    result.cspViolations = window.cspViolations
+    document.querySelector('#result').textContent = JSON.stringify(result)
+  }, 50)
 }
 const table = (id, extra = '') => `
   <table id="${id}" class="table data-table" data-table-paging="true"
@@ -89,29 +104,59 @@ const table = (id, extra = '') => `
 const customText = 'Search &quot;articles&quot; &amp; &lt;img src=x onerror=alert(1)&gt; $1 &#39;today&#39;'
 writeFileSync(fixture, `<!doctype html><html><head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="${pathToFileURL(join(output, 'css/main.css'))}">
-  <style>
-    body { padding: 16px; }
-    .host { max-width: 900px; }
-    .form-select, .form-control { transition: none !important; }
-  </style>
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/fixture.css">
   </head><body>
     <div class="host">${table('list', `data-table-controls-layout="list"
       data-table-search-label="${customText}" data-table-search-placeholder="${customText}"`)}</div>
     <div class="host">${table('compact')}</div>
     <div class="host">${table('other', 'data-table-controls-layout="list" data-table-search-placeholder="Search releases…"')}</div>
     <div class="host">${table('custom', `data-table-search-label="${customText}" data-table-search-placeholder="${customText}"`)}</div>
-    <script src="${pathToFileURL(join(output, 'js/main.bundle.js'))}"></script>
+    <div data-filter-container="fallback">
+      <button data-filter-table="fallback" data-filter-value="">All</button>
+      <button data-filter-table="fallback" data-filter-value="news">News</button>
+      <table id="fallback" data-filter-col="0"><tbody><tr><td>News</td></tr><tr><td>Notes</td></tr></tbody></table>
+    </div>
+    <script src="/probe.js"></script>
+    <script src="/main.js"></script>
     <output id="result"></output>
-    <script>window.addEventListener('load', () => setTimeout(${probe.toString()}, 30))</script>
   </body></html>`)
+
+// Serve every fixture asset externally under an enforced policy. File URLs and inline
+// test scripts/styles would bypass the production constraint this regression must cover.
+const fixtureCSS = 'body{padding:16px}.host{max-width:900px}.form-select,.form-control{transition:none!important}'
+const fixtureJS = `window.cspViolations = [];
+  document.addEventListener('securitypolicyviolation', event => {
+    window.cspViolations.push({ directive: event.effectiveDirective, blocked: event.blockedURI });
+  });
+  window.addEventListener('load', () => setTimeout(${probe.toString()}, 30));`
+const server = createServer((request, response) => {
+  const pathname = new URL(request.url, 'http://localhost').pathname
+  const assets = {
+    '/': ['text/html', () => readFileSync(fixture)],
+    '/main.css': ['text/css', () => readFileSync(join(output, 'css/main.css'))],
+    '/main.js': ['text/javascript', () => readFileSync(join(output, 'js/main.bundle.js'))],
+    '/fixture.css': ['text/css', () => fixtureCSS],
+    '/probe.js': ['text/javascript', () => fixtureJS]
+  }
+  const asset = assets[pathname]
+  if (!asset) { response.writeHead(404); response.end(); return }
+  response.writeHead(200, {
+    'Content-Type': `${asset[0]}; charset=utf-8`,
+    'Content-Security-Policy': "default-src 'none'; script-src 'self'; style-src 'self'; style-src-attr 'none'; img-src 'self' data:; font-src 'self'; base-uri 'none'"
+  })
+  response.end(asset[1]())
+})
+test.before(async () => {
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+  fixtureURL = `http://127.0.0.1:${server.address().port}/`
+})
 
 // Chrome clamps --window-size below 500px on some platforms. Use its debugging pipe
 // to set the actual CSS viewport, without adding a browser-driver dependency.
 const runBrowser = async (width, theme) => {
   const child = spawn(chrome, [
     '--headless=new', '--no-sandbox', '--disable-gpu', '--remote-debugging-pipe',
-    '--allow-file-access-from-files',
     `--user-data-dir=${join(fixtureDir, `profile-${width}-${theme}`)}`
   ], { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'] })
   let sequence = 0
@@ -150,7 +195,7 @@ const runBrowser = async (width, theme) => {
       width, height: 1000, deviceScaleFactor: 1, mobile: false
     }, sessionId)
     await send('Page.navigate', {
-      url: `${pathToFileURL(fixture).href}?theme=${theme}`
+      url: `${fixtureURL}?theme=${theme}`
     }, sessionId)
     const deadline = Date.now() + 15000
     while (Date.now() < deadline) {
@@ -168,11 +213,19 @@ const runBrowser = async (width, theme) => {
   }
 }
 
-test.after(() => rmSync(fixtureDir, { recursive: true, force: true }))
+test.after(async () => {
+  if (server.listening) await new Promise(resolve => server.close(resolve))
+  rmSync(fixtureDir, { recursive: true, force: true })
+})
 for (const width of [1400, 390, 320]) for (const theme of ['light', 'dark']) {
   test(`list controls fit a ${width}px viewport in ${theme} mode and retain search and paging`, { timeout: 30000 }, async () => {
     const result = await runBrowser(width, theme)
     assert.equal(result.error, undefined)
+    assert.equal(result.templateHasInlineStyle, false, 'the list template must not emit inline style attributes')
+    assert.deepEqual(result.inlineStyles, [], 'managed table controls and filtering must not generate inline styles')
+    assert.deepEqual(result.cspViolations, [], 'controls must work with inline styles and scripts prohibited')
+    assert.deepEqual(result.fallbackFiltered, ['News'])
+    assert.equal(result.fallbackRestored, true)
     assert.equal(result.viewportWidth, width, "test must exercise the requested viewport")
     assert.deepEqual(result.infoStyle, result.labelStyle, 'count matches the page-size label typography')
     if (width >= 576) assert.equal(result.infoCentered, true, 'count is centered in the desktop footer')

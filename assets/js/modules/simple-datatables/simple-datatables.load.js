@@ -201,6 +201,9 @@ const wrapColumnGroups = (table, groups) => {
 }
 
 let tableOptions = {
+    // The library's fixed-column measurement writes inline width attributes. Let CSS
+    // table layout size the columns so the defaults work under a strict style-src policy.
+    fixedColumns: false,
     locale: "{{ site.Language.Lang | default "en" }}",
     labels: {
       placeholder: "{{ T "tablePlaceholder" }}",
@@ -248,7 +251,7 @@ const dataTableListTemplate = (options, dom) => `
                     ${dom.id ? `aria-controls="${dataTableEscape(dom.id)}"` : ""}>
             </label>
         </div>` : ""}</div>
-    <div class="${options.classes.container}"${options.scrollY.length ? ` style="height: ${options.scrollY}; overflow-y: auto;"` : ""}>
+    <div class="${options.classes.container}">
         ${options.sortable ? `<p hidden id="sort-hint">${options.labels.sortHint}</p>` : ""}
     </div>
     <div class="${options.classes.bottom}">${options.paging ? `
@@ -504,12 +507,12 @@ try {
                     const col = parseInt(table.getAttribute('data-filter-col') ?? '1')
                     table.querySelectorAll('tbody tr').forEach(row => {
                         if (!filterValue) {
-                            row.style.display = ''
+                            row.hidden = false
                             return
                         }
                         const cell = row.cells[col]
                         const text = cell ? cell.textContent.trim().toLowerCase() : ''
-                        row.style.display = text.includes(filterValue) ? '' : 'none'
+                        row.hidden = !text.includes(filterValue)
                     })
                 })
             }
