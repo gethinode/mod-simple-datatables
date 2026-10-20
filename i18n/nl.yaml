@@ -20,3 +20,7 @@
   translation: "Alles"
 - id: tableFilterLabel
   translation: "Filteren"
+- id: tablePerPageLabel
+  translation: "per pagina"
+- id: tableInfoCompact
+  translation: "{start}–{end} van {rows}"

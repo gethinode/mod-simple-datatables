@@ -50,6 +50,18 @@ Simple datatables is compatible with Bootstrap tables. It uses Hugo's `i18n` fol
 | data-table-paging-option-perPageSelect     | `[5, 10, 20, 50, ["{{ T "tablePerPageSelectAll" }}", -1]]`  | Paging option: Sets the per page options in the dropdown. i18 translation id for all: tablePerPageSelectAll |
 | data-table-searchable | `true`  | Toggle the ability to search the dataset. |
 
+### List controls and search text
+
+Set `data-table-controls-layout="list"` for full-width search above the table and a
+bottom toolbar containing page size, result count, and navigation. The toolbar stacks
+on small screens. Omitting the attribute retains the compact arrangement.
+
+Override `data-table-search-label` and `data-table-search-placeholder` to customize
+individual tables. The label remains available to assistive technology after the
+placeholder disappears. Values are treated as plain text, and omitted values use
+the active language's translations. These settings also apply to manually initialized
+tables using `window.hinodeDatatables.options(table)`.
+
 ### Responsive tables
 
 Place a table in its own Bootstrap `.table-responsive` or `.table-responsive-{sm|md|lg|xl|xxl}`
@@ -61,6 +73,21 @@ destroying the DataTable restores each responsive class to its original wrapper.
 
 Wrappers containing other elements keep their responsive classes, so those elements retain their
 scrolling behavior. Tables without a responsive wrapper are unchanged.
+
+### Content Security Policy
+
+Default initialization leaves column sizing to CSS table layout (`fixedColumns: false`)
+and the list template emits no inline style attributes. Filtering without a DataTable
+instance uses the native `hidden` attribute. Style and constrain table containers through
+external stylesheets.
+
+Manually enabling the library's `fixedColumns`, `fixedHeight`, or `scrollY` features can
+produce inline styles and is outside these strict-CSP defaults. The list layout uses its
+natural content height rather than rendering the library's inline `scrollY` container style.
+
+The list-control browser tests serve their scripts and styles as external assets under
+`script-src 'self'; style-src 'self'; style-src-attr 'none'`. They assert both zero CSP
+violations and zero generated inline style attributes after initialization and interaction.
 
 ### Initializing tables added later
 

@@ -20,4 +20,7 @@
   translation: "Tous"
 - id: tableFilterLabel
   translation: "Filtrer"
- 
+- id: tablePerPageLabel
+  translation: "par page"
+- id: tableInfoCompact
+  translation: "{start}–{end} sur {rows}"

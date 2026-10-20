@@ -11,3 +11,117 @@
     display: inline-block;
     width: auto;
 }
+
+
+// Keep controls in document order and let them reflow independently of the table's scroll area.
+.datatable-top,
+.datatable-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+
+    &::after { display: none; }
+    &:empty { display: none; }
+
+    > div,
+    > nav { float: none; }
+}
+
+.datatable-search {
+    min-width: 0;
+
+    label { display: block; }
+    input { max-width: 100%; }
+}
+
+.datatable-dropdown label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.datatable-pagination .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.125rem;
+    margin: 0;
+}
+
+.datatable-pagination .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    margin: 0;
+}
+
+.datatable-list {
+    .datatable-top {
+        padding: 0 0 1rem;
+    }
+
+    .datatable-search,
+    .datatable-search input { width: 100%; }
+
+    .datatable-bottom {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        padding: 1rem 0 0;
+
+        &:empty { display: none; }
+    }
+
+    .datatable-dropdown {
+        grid-column: 1;
+        justify-self: start;
+    }
+
+    .datatable-info {
+        grid-column: 2;
+        margin: 0;
+        font: inherit;
+        color: inherit;
+        text-align: center;
+    }
+
+    .datatable-pagination {
+        grid-column: 3;
+        justify-self: end;
+        min-width: 0;
+        margin-inline-start: 0;
+
+        .pagination { justify-content: flex-end; }
+    }
+}
+
+@media (max-width: 575.98px) {
+    .datatable-top > .search-data-table,
+    .datatable-top > .datatable-search {
+        width: 100%;
+
+        input { width: 100%; }
+    }
+
+    .datatable-list {
+        .datatable-bottom {
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 0.75rem;
+        }
+        .datatable-info { justify-self: end; }
+        .datatable-pagination {
+            display: flex;
+            justify-content: center;
+            grid-column: 1 / -1;
+            justify-self: stretch;
+            margin-inline-start: 0;
+
+            .pagination { justify-content: center; }
+        }
+        .datatable-ellipsis,
+        .datatable-hidden { display: none; }
+    }
+}

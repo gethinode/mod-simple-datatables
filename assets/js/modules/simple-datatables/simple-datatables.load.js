@@ -201,6 +201,9 @@ const wrapColumnGroups = (table, groups) => {
 }
 
 let tableOptions = {
+    // The library's fixed-column measurement writes inline width attributes. Let CSS
+    // table layout size the columns so the defaults work under a strict style-src policy.
+    fixedColumns: false,
     locale: "{{ site.Language.Lang | default "en" }}",
     labels: {
       placeholder: "{{ T "tablePlaceholder" }}",
@@ -230,6 +233,34 @@ let tableOptions = {
     }
 }
 
+
+// Labels are inserted into the library's HTML template, including quoted attributes.
+// Escape author-supplied text at that boundary for both compact and list controls.
+const dataTableEscape = value => String(value).replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+})[character])
+
+// The list toolbar keeps discovery above the records and paging below them. The library still
+// owns every control and its events; no generated nodes are moved after initialization.
+const dataTableListTemplate = (options, dom) => `
+    <div class="${options.classes.top}">${options.searchable ? `
+        <div class="${options.classes.search}">
+            <label class="${options.classes.searchLabel}">${options.labels.searchLabel}
+                <input class="${options.classes.input}" type="search" name="search"
+                    placeholder="${options.labels.placeholder}" title="${options.labels.searchTitle}"
+                    ${dom.id ? `aria-controls="${dataTableEscape(dom.id)}"` : ""}>
+            </label>
+        </div>` : ""}</div>
+    <div class="${options.classes.container}">
+        ${options.sortable ? `<p hidden id="sort-hint">${options.labels.sortHint}</p>` : ""}
+    </div>
+    <div class="${options.classes.bottom}">${options.paging ? `
+        ${options.perPageSelect ? `<div class="${options.classes.dropdown}"><label>
+            <select class="${options.classes.selector}" name="per-page"></select>
+            <span>${options.labels.perPage}</span>
+        </label></div>` : ""}
+        <div class="${options.classes.info}" role="status" aria-live="polite"></div>
+        <nav class="${options.classes.pagination}"></nav>` : ""}</div>`
 
 // Track DataTable instances keyed by filter container ID. An array is used per ID so several
 // tables can share one filter button group.
@@ -301,6 +332,24 @@ const dataTableOptions = tbl => {
         perPageSelect: perPageSelect
     }
 
+    const searchLabel = tbl.getAttribute('data-table-search-label')
+    if (searchLabel) {
+        options.labels.searchLabel = `<span class="visually-hidden">${dataTableEscape(searchLabel)}</span>`
+        options.labels.searchTitle = dataTableEscape(searchLabel)
+    }
+    const searchPlaceholder = tbl.getAttribute('data-table-search-placeholder')
+    if (searchPlaceholder) {
+        options.labels.placeholder = dataTableEscape(searchPlaceholder)
+    }
+    if (tbl.getAttribute('data-table-controls-layout') === 'list') {
+        options.template = dataTableListTemplate
+        options.classes.wrapper = 'datatable-wrapper datatable-list'
+        options.classes.search = 'datatable-search'
+        options.labels.perPage = "{{ T "tablePerPageLabel" }}"
+        options.labels.info = "{{ T "tableInfoCompact" }}"
+        options.pagerDelta = 0
+    }
+
     // A wrapped table renders its last column on a row of its own below the main breakpoint.
     const media = dataTableWrapMedia(tbl)
     const wrapCols = media ? tbl.getAttribute('data-table-wrap-cols') : null
@@ -360,6 +409,22 @@ const dataTableAttach = (tbl, dt) => {
         return
     }
     dataTableAttached.add(dt)
+
+    if (tbl.getAttribute('data-table-controls-layout') === 'list') {
+        // Our compact translations share a numeric start–end range. Collapse equal indices
+        // after the library renders; its own count already handles filtering and folded rows.
+        const compactInfo = () => {
+            const info = dt.wrapperDOM.querySelector('.datatable-info')
+            if (!info) return
+            const text = info.textContent.replace(/\b(\d+)–\1\b/g, '$1')
+            if (text !== info.textContent) info.textContent = text
+        }
+        for (const event of ['init', 'page', 'perpage', 'search', 'multisearch', 'update', 'refresh']) {
+            dt.on(`datatable.${event}`, compactInfo)
+        }
+        compactInfo()
+    }
+
     // Register once per instance, but restore the wrappers of its current initialization.
     dt.on('datatable.destroy', () => {
         const wrappers = dataTableResponsive.get(dt)
@@ -442,12 +507,12 @@ try {
                     const col = parseInt(table.getAttribute('data-filter-col') ?? '1')
                     table.querySelectorAll('tbody tr').forEach(row => {
                         if (!filterValue) {
-                            row.style.display = ''
+                            row.hidden = false
                             return
                         }
                         const cell = row.cells[col]
                         const text = cell ? cell.textContent.trim().toLowerCase() : ''
-                        row.style.display = text.includes(filterValue) ? '' : 'none'
+                        row.hidden = !text.includes(filterValue)
                     })
                 })
             }
