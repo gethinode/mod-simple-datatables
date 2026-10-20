@@ -50,6 +50,18 @@ Simple datatables is compatible with Bootstrap tables. It uses Hugo's `i18n` fol
 | data-table-paging-option-perPageSelect     | `[5, 10, 20, 50, ["{{ T "tablePerPageSelectAll" }}", -1]]`  | Paging option: Sets the per page options in the dropdown. i18 translation id for all: tablePerPageSelectAll |
 | data-table-searchable | `true`  | Toggle the ability to search the dataset. |
 
+### List controls and search text
+
+Set `data-table-controls-layout="list"` for full-width search above the table and a
+bottom toolbar containing page size, result count, and navigation. The toolbar stacks
+on small screens. Omitting the attribute retains the compact arrangement.
+
+Override `data-table-search-label` and `data-table-search-placeholder` to customize
+individual tables. The label remains available to assistive technology after the
+placeholder disappears. Values are treated as plain text, and omitted values use
+the active language's translations. These settings also apply to manually initialized
+tables using `window.hinodeDatatables.options(table)`.
+
 ### Responsive tables
 
 Place a table in its own Bootstrap `.table-responsive` or `.table-responsive-{sm|md|lg|xl|xxl}`
