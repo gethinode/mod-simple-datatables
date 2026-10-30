@@ -566,6 +566,24 @@ try {
             }
         })
     })
+
+    // Deep link: `?filter=<value>` applies a filter on load through the same click handler, so the
+    // active button state and the search source stay in one place. An unknown value is ignored.
+    // This bundle loads `async`, so the click waits for the window load event: Hinode's nav script
+    // syncs the responsive dropdown from a listener that may not be attached any sooner.
+    const initialFilter = new URLSearchParams(window.location.search).get('filter')?.toLowerCase()
+    if (initialFilter) {
+        const applyInitialFilter = () => {
+            Array.from(document.querySelectorAll('[data-filter-table]'))
+                .find(btn => btn.getAttribute('data-filter-value').toLowerCase() === initialFilter)
+                ?.click()
+        }
+        if (document.readyState === 'complete') {
+            applyInitialFilter()
+        } else {
+            window.addEventListener('load', applyInitialFilter, { once: true })
+        }
+    }
 } finally {
     // Announce the API. This bundle loads `async`, so a script that needs the options may run before
     // or after it: one that finds `window.hinodeDatatables` unset listens for this event instead. It

@@ -74,6 +74,13 @@ destroying the DataTable restores each responsive class to its original wrapper.
 Wrappers containing other elements keep their responsive classes, so those elements retain their
 scrolling behavior. Tables without a responsive wrapper are unchanged.
 
+### Linking to a filtered table
+
+A page with a category filter button group applies a filter from the URL: `?filter=<value>`
+selects the button with that `data-filter-value`, ignoring case, when the page loads. An
+unknown value leaves the table unfiltered. If the page has several button groups, the first
+one with a matching value is selected.
+
 ### Content Security Policy
 
 Default initialization leaves column sizing to CSS table layout (`fixedColumns: false`)
