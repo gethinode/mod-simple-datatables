@@ -52,7 +52,7 @@
     "replace-in-files-cli": "^4.0.0",
     "rimraf": "^6.1.4",
     "semantic-release": "^26.0.1",
-    "simple-datatables": "^10.3.0"
+    "simple-datatables": "^10.4.0"
   },
   "release": {
     "branches": "main",
