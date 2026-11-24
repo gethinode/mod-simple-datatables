@@ -8,7 +8,8 @@
     {{- $files = $files | append $file -}}
 {{- end -}}
 
-{{- $options := (dict "transpiler" "libsass" "targetPath" $target) -}}
+{{- $transpiler := cond (lt hugo.Version "0.170.0") "libsass" "dartsass" -}}
+{{- $options := (dict "transpiler" $transpiler "targetPath" $target) -}}
 {{- $options = merge $options (dict "outputStyle" "expanded") -}}
 
 <!-- TODO: fix workaround replacing resources.Get with resources.GetMatch -->
